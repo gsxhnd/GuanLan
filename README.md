@@ -10,6 +10,12 @@ uv sync
 # git clone https://github.com/microsoft/qlib.git
 ```
 
+```shell
+go mod tidy
+go install tool
+buf mod update
+```
+
 ## Data
 
 [yahoo finance数据下载](https://github.com/ranaroussi/yfinance)
