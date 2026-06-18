@@ -7,13 +7,12 @@ interface UIStore {
   theme: Theme
   locale: string
   sidebarWidth: number
-  inspectorWidth: number
-  inspectorVisible: boolean
+  sidebarCollapsed: boolean
   setTheme: (theme: Theme) => void
   setLocale: (locale: string) => void
   setSidebarWidth: (width: number) => void
-  setInspectorWidth: (width: number) => void
-  setInspectorVisible: (visible: boolean) => void
+  setSidebarCollapsed: (collapsed: boolean) => void
+  toggleSidebarCollapsed: () => void
 }
 
 export const useUIStore = create<UIStore>()(
@@ -22,13 +21,13 @@ export const useUIStore = create<UIStore>()(
       theme: "system",
       locale: "zh",
       sidebarWidth: 240,
-      inspectorWidth: 320,
-      inspectorVisible: true,
+      sidebarCollapsed: false,
       setTheme: (theme) => set({ theme }),
       setLocale: (locale) => set({ locale }),
       setSidebarWidth: (sidebarWidth) => set({ sidebarWidth }),
-      setInspectorWidth: (inspectorWidth) => set({ inspectorWidth }),
-      setInspectorVisible: (inspectorVisible) => set({ inspectorVisible }),
+      setSidebarCollapsed: (sidebarCollapsed) => set({ sidebarCollapsed }),
+      toggleSidebarCollapsed: () =>
+        set((state) => ({ sidebarCollapsed: !state.sidebarCollapsed })),
     }),
     {
       name: "guanlan-ui",

@@ -4,31 +4,55 @@
     "tagline": "Application shell"
   },
   "nav": {
-    "home": "Home",
-    "settings": "Settings"
+    "overview": "Overview",
+    "data": "Data",
+    "watchlist": "Watchlist",
+    "portfolio": "Portfolio",
+    "review": "Review",
+    "analysis": "Analysis",
+    "backtest": "Backtest",
+    "alerts": "Alerts",
+    "system": "System"
   },
-  "home": {
-    "title": "Welcome to GuanLan",
-    "description": "The basic layout, theme, routing, and i18n foundation are ready for your own product features.",
-    "primaryAction": "Primary action",
-    "secondaryAction": "Secondary action",
-    "cards": {
-      "first": {
-        "title": "Layout",
-        "description": "The resizable three-panel layout and header are in place."
-      },
-      "second": {
-        "title": "Theme",
-        "description": "Light, dark, and system theme switching are preserved."
-      },
-      "third": {
-        "title": "Extend",
-        "description": "Add your pages, state, and API integrations from here."
-      }
+  "pages": {
+    "overview": {
+      "title": "Overview",
+      "description": "Monitor system status, task progress, and key metric summaries."
+    },
+    "data": {
+      "title": "Data",
+      "description": "Manage index and stock daily bars, quality status, and task history."
+    },
+    "watchlist": {
+      "title": "Watchlist",
+      "description": "Maintain followed stocks and inspect data sync and enablement status."
+    },
+    "portfolio": {
+      "title": "Portfolio",
+      "description": "Record trades, dividends, and cash flows; review holdings and assets."
+    },
+    "review": {
+      "title": "Review",
+      "description": "Summarize annual returns, contributions, and year-over-year comparisons."
+    },
+    "analysis": {
+      "title": "Analysis",
+      "description": "Review daily analysis results, signals, and historical traceability."
+    },
+    "backtest": {
+      "title": "Backtest",
+      "description": "Create backtest jobs and review reports and result comparisons."
+    },
+    "alerts": {
+      "title": "Alerts",
+      "description": "View centralized alerts for data, tasks, and service health."
+    },
+    "system": {
+      "title": "System",
+      "description": "Inspect service health and configure theme and language preferences."
     }
   },
   "settings": {
-    "title": "Settings",
     "theme": "Theme",
     "language": "Language"
   },
@@ -38,15 +62,8 @@
   },
   "layout": {
     "primary": {
-      "title": "Navigation"
-    },
-    "secondary": {
-      "title": "Side Panel",
-      "placeholder": "Use this area for details, properties, or assistant content"
-    },
-    "header": {
-      "searchPlaceholder": "Search or type a command...",
-      "toggleInspector": "Toggle side panel"
+      "collapse": "Collapse sidebar",
+      "expand": "Expand sidebar"
     }
   }
 }

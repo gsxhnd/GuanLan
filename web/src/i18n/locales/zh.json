@@ -4,31 +4,55 @@
     "tagline": "应用骨架"
   },
   "nav": {
-    "home": "首页",
-    "settings": "设置"
+    "overview": "总览",
+    "data": "数据",
+    "watchlist": "股票池",
+    "portfolio": "组合",
+    "review": "复盘",
+    "analysis": "分析",
+    "backtest": "回测",
+    "alerts": "告警",
+    "system": "系统"
   },
-  "home": {
-    "title": "欢迎使用 GuanLan",
-    "description": "这里保留应用的基础布局、主题、路由和国际化能力，方便继续填充你的业务功能。",
-    "primaryAction": "主要操作",
-    "secondaryAction": "次要操作",
-    "cards": {
-      "first": {
-        "title": "布局",
-        "description": "三栏可调整布局和顶部工具栏已经就绪。"
-      },
-      "second": {
-        "title": "主题",
-        "description": "保留浅色、深色和跟随系统的主题切换。"
-      },
-      "third": {
-        "title": "扩展",
-        "description": "从这里开始接入你的页面、状态和接口。"
-      }
+  "pages": {
+    "overview": {
+      "title": "总览",
+      "description": "查看系统运行状态、任务进度和关键指标摘要。"
+    },
+    "data": {
+      "title": "数据",
+      "description": "管理指数与个股日频数据、质量状态和任务记录。"
+    },
+    "watchlist": {
+      "title": "股票池",
+      "description": "维护关注股票列表，查看数据获取与启用状态。"
+    },
+    "portfolio": {
+      "title": "组合",
+      "description": "记录交易、分红和现金流，查看持仓与资产概览。"
+    },
+    "review": {
+      "title": "复盘",
+      "description": "按年度汇总收益、贡献和跨年对比。"
+    },
+    "analysis": {
+      "title": "分析",
+      "description": "查看每日分析结果、信号和历史追溯。"
+    },
+    "backtest": {
+      "title": "回测",
+      "description": "创建回测任务并查看报告与结果对比。"
+    },
+    "alerts": {
+      "title": "告警",
+      "description": "集中查看数据、任务和服务的异常告警。"
+    },
+    "system": {
+      "title": "系统",
+      "description": "查看服务健康状态，并配置主题与语言偏好。"
     }
   },
   "settings": {
-    "title": "设置",
     "theme": "主题",
     "language": "语言"
   },
@@ -38,15 +62,8 @@
   },
   "layout": {
     "primary": {
-      "title": "导航"
-    },
-    "secondary": {
-      "title": "侧边面板",
-      "placeholder": "这里可以放置详情、属性或辅助内容"
-    },
-    "header": {
-      "searchPlaceholder": "搜索或输入命令…",
-      "toggleInspector": "切换侧边面板"
+      "collapse": "收起侧栏",
+      "expand": "展开侧栏"
     }
   }
 }

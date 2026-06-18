@@ -24,6 +24,10 @@ plugins:
   # - remote: buf.build/grpc-ecosystem/openapiv2:v2.28.0
   - local: protoc-gen-openapiv2
     out: docs/openapi
+  # - remote: buf.build/protocolbuffers/python
+  #   out: gen/python
+  # - remote: buf.build/grpc/python
+  #   out: gen/python
 
 inputs:
   - directory: proto
