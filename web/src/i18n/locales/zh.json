@@ -1,0 +1,52 @@
+{
+  "app": {
+    "name": "GuanLan",
+    "tagline": "应用骨架"
+  },
+  "nav": {
+    "home": "首页",
+    "settings": "设置"
+  },
+  "home": {
+    "title": "欢迎使用 GuanLan",
+    "description": "这里保留应用的基础布局、主题、路由和国际化能力，方便继续填充你的业务功能。",
+    "primaryAction": "主要操作",
+    "secondaryAction": "次要操作",
+    "cards": {
+      "first": {
+        "title": "布局",
+        "description": "三栏可调整布局和顶部工具栏已经就绪。"
+      },
+      "second": {
+        "title": "主题",
+        "description": "保留浅色、深色和跟随系统的主题切换。"
+      },
+      "third": {
+        "title": "扩展",
+        "description": "从这里开始接入你的页面、状态和接口。"
+      }
+    }
+  },
+  "settings": {
+    "title": "设置",
+    "theme": "主题",
+    "language": "语言"
+  },
+  "common": {
+    "loading": "加载中...",
+    "error": "出错了"
+  },
+  "layout": {
+    "primary": {
+      "title": "导航"
+    },
+    "secondary": {
+      "title": "侧边面板",
+      "placeholder": "这里可以放置详情、属性或辅助内容"
+    },
+    "header": {
+      "searchPlaceholder": "搜索或输入命令…",
+      "toggleInspector": "切换侧边面板"
+    }
+  }
+}

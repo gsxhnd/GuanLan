@@ -1,0 +1,52 @@
+{
+  "app": {
+    "name": "GuanLan",
+    "tagline": "Application shell"
+  },
+  "nav": {
+    "home": "Home",
+    "settings": "Settings"
+  },
+  "home": {
+    "title": "Welcome to GuanLan",
+    "description": "The basic layout, theme, routing, and i18n foundation are ready for your own product features.",
+    "primaryAction": "Primary action",
+    "secondaryAction": "Secondary action",
+    "cards": {
+      "first": {
+        "title": "Layout",
+        "description": "The resizable three-panel layout and header are in place."
+      },
+      "second": {
+        "title": "Theme",
+        "description": "Light, dark, and system theme switching are preserved."
+      },
+      "third": {
+        "title": "Extend",
+        "description": "Add your pages, state, and API integrations from here."
+      }
+    }
+  },
+  "settings": {
+    "title": "Settings",
+    "theme": "Theme",
+    "language": "Language"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Something went wrong"
+  },
+  "layout": {
+    "primary": {
+      "title": "Navigation"
+    },
+    "secondary": {
+      "title": "Side Panel",
+      "placeholder": "Use this area for details, properties, or assistant content"
+    },
+    "header": {
+      "searchPlaceholder": "Search or type a command...",
+      "toggleInspector": "Toggle side panel"
+    }
+  }
+}

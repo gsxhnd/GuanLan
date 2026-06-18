@@ -1,1 +1,19 @@
-qlib/
+# Rust workspace
+target/
+
+# Node.js
+node_modules/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# OS
+.DS_Store
+
+# Runtime data
+data/duckdb/
+data/models/
+data/logs/
