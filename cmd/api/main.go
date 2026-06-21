@@ -6,8 +6,8 @@ func main() {
 	fx.New(
 		fx.Provide(
 			NewConfig,
-			NewServeMux,
-			NewApp,
+			NewListener,
+			NewGRPCServer,
 		),
 		fx.Invoke(Run),
 	).Run()

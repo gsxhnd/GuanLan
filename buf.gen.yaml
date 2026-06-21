@@ -4,9 +4,9 @@ managed:
   disable:
     # Don't modify any files in buf.build/googleapis/googleapis
     - module: buf.build/googleapis/googleapis
-  override:
-    - file_option: go_package_prefix
-      value: go_micro_framework/gen\
+  # override:
+  #   - file_option: go_package_prefix
+  #     value: x123/gen
 
 plugins:
   # - remote: buf.build/protocolbuffers/go

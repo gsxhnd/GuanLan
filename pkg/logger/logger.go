@@ -96,6 +96,8 @@ func NewLogger(cfg *LoggerConfig) (Logger, error) {
 	switch cfg.Output {
 	case "console":
 		core = zapcore.NewCore(devEncoder, os.Stdout, level)
+	case "file":
+		core = zapcore.NewCore(prodEncoder, os.Stdout, level)
 	case "none":
 		core = zapcore.NewNopCore()
 	default:
