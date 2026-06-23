@@ -1,70 +1,92 @@
-import { useEffect } from "react"
 import { useTranslation } from "react-i18next"
 
-import { SectionPage } from "@/components/section-page"
+import {
+  ContentCard,
+  PageHeader,
+  StatCard,
+  StatGrid,
+  StatusBadge,
+} from "@/components/page"
+import { PreferencesPanel } from "@/components/settings/preferences-panel"
 import { Button } from "@/components/ui/button"
-import { useTheme } from "@/components/theme-provider"
-import { useUIStore } from "@/stores/ui"
-
-const locales = [
-  { value: "zh", label: "中文" },
-  { value: "en", label: "English" },
-] as const
-
-const themes = [
-  { value: "light", label: "Light" },
-  { value: "dark", label: "Dark" },
-  { value: "system", label: "System" },
-] as const
 
 export function SystemPage() {
-  const { t, i18n } = useTranslation()
-  const { locale, setLocale } = useUIStore()
-  const { theme, setTheme } = useTheme()
-
-  useEffect(() => {
-    void i18n.changeLanguage(locale)
-  }, [i18n, locale])
+  const { t } = useTranslation()
 
   return (
-    <div className="flex flex-col gap-8">
-      <SectionPage
-        titleKey="pages.system.title"
-        descriptionKey="pages.system.description"
+    <div className="flex flex-col gap-6">
+      <PageHeader
+        title={t("pages.system.title")}
+        description={t("pages.system.description")}
       />
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium">{t("settings.language")}</h2>
-        <div className="flex flex-wrap gap-2">
-          {locales.map((item) => (
-            <Button
-              key={item.value}
-              variant={locale === item.value ? "default" : "outline"}
-              onClick={() => {
-                setLocale(item.value)
-                void i18n.changeLanguage(item.value)
-              }}
-            >
-              {item.label}
-            </Button>
-          ))}
-        </div>
-      </section>
+      <StatGrid cols={3}>
+        <StatCard label={t("settings.services.api")}>
+          <div className="mt-2">
+            <StatusBadge variant="success" dot>
+              healthy
+            </StatusBadge>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t("settings.services.apiUptime")}
+          </p>
+        </StatCard>
+        <StatCard label={t("settings.services.duckdb")}>
+          <div className="mt-2">
+            <StatusBadge variant="success" dot>
+              healthy
+            </StatusBadge>
+          </div>
+          <p className="mt-2 font-mono text-xs text-muted-foreground">
+            ~/guanlan/data.duckdb
+          </p>
+        </StatCard>
+        <StatCard label={t("settings.services.python")}>
+          <div className="mt-2">
+            <StatusBadge variant="warn" dot>
+              degraded
+            </StatusBadge>
+          </div>
+          <p className="mt-2 text-xs text-muted-foreground">
+            {t("settings.services.pythonDetail")}
+          </p>
+        </StatCard>
+      </StatGrid>
 
-      <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-medium">{t("settings.theme")}</h2>
-        <div className="flex flex-wrap gap-2">
-          {themes.map((item) => (
-            <Button
-              key={item.value}
-              variant={theme === item.value ? "default" : "outline"}
-              onClick={() => setTheme(item.value)}
-            >
-              {item.label}
-            </Button>
-          ))}
+      <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
+        <PreferencesPanel />
+
+        <ContentCard title={t("settings.deploymentTitle")}>
+          <dl className="grid grid-cols-[auto_1fr] gap-x-6 gap-y-3 text-sm">
+            <dt className="text-muted-foreground">
+              {t("settings.deployment.dbPath")}
+            </dt>
+            <dd className="m-0 font-mono text-[13px]">~/guanlan/data.duckdb</dd>
+            <dt className="text-muted-foreground">
+              {t("settings.deployment.logDir")}
+            </dt>
+            <dd className="m-0 font-mono text-[13px]">~/guanlan/logs/</dd>
+            <dt className="text-muted-foreground">
+              {t("settings.deployment.scheduler")}
+            </dt>
+            <dd className="m-0">{t("settings.deployment.schedulerValue")}</dd>
+            <dt className="text-muted-foreground">
+              {t("settings.deployment.mode")}
+            </dt>
+            <dd className="m-0">{t("settings.deployment.modeValue")}</dd>
+          </dl>
+        </ContentCard>
+      </div>
+
+      <ContentCard title={t("settings.shortcutsTitle")}>
+        <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
+          <Button variant="secondary">{t("settings.shortcuts.logs")}</Button>
+          <Button variant="secondary">
+            {t("settings.shortcuts.dataVersions")}
+          </Button>
+          <Button variant="ghost">{t("settings.shortcuts.questions")}</Button>
         </div>
-      </section>
+      </ContentCard>
     </div>
   )
 }

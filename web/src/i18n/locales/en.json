@@ -48,13 +48,43 @@
       "description": "View centralized alerts for data, tasks, and service health."
     },
     "system": {
-      "title": "System",
+      "title": "System & Settings",
       "description": "Inspect service health and configure theme and language preferences."
     }
   },
   "settings": {
     "theme": "Theme",
-    "language": "Language"
+    "language": "Language",
+    "preferencesTitle": "Preferences",
+    "themeDescription": "Choose a color scheme or follow your system setting.",
+    "languageDescription": "Switch the interface display language.",
+    "themeLight": "Light",
+    "themeDark": "Dark",
+    "themeSystem": "System",
+    "languageZh": "简体中文",
+    "languageEn": "English",
+    "deploymentTitle": "Deployment",
+    "deployment": {
+      "dbPath": "Database path",
+      "logDir": "Log directory",
+      "scheduler": "Task scheduler",
+      "schedulerValue": "cron + manual trigger",
+      "mode": "Deployment mode",
+      "modeValue": "Local single-user"
+    },
+    "services": {
+      "api": "API service",
+      "apiUptime": "uptime 14d 6h",
+      "duckdb": "DuckDB",
+      "python": "Python data service",
+      "pythonDetail": "TSLA task retrying"
+    },
+    "shortcutsTitle": "Shortcuts",
+    "shortcuts": {
+      "logs": "View task logs",
+      "dataVersions": "Data version management",
+      "questions": "Open questions (06-open-questions)"
+    }
   },
   "common": {
     "loading": "Loading...",

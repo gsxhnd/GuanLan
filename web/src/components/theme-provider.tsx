@@ -1,6 +1,8 @@
 /* eslint-disable react-refresh/only-export-components */
 import * as React from "react"
 
+import { useUIStore } from "@/stores/ui"
+
 type Theme = "dark" | "light" | "system"
 type ResolvedTheme = "dark" | "light"
 
@@ -85,6 +87,18 @@ export function ThemeProvider({
   ...props
 }: ThemeProviderProps) {
   const [theme, setThemeState] = React.useState<Theme>(() => {
+    try {
+      const uiState = JSON.parse(
+        localStorage.getItem("guanlan-ui") ?? "{}"
+      ) as { state?: { theme?: string } }
+      const uiTheme = uiState.state?.theme ?? null
+      if (isTheme(uiTheme)) {
+        return uiTheme
+      }
+    } catch {
+      // ignore malformed persisted UI state
+    }
+
     const storedTheme = localStorage.getItem(storageKey)
     if (isTheme(storedTheme)) {
       return storedTheme
@@ -97,6 +111,7 @@ export function ThemeProvider({
     (nextTheme: Theme) => {
       localStorage.setItem(storageKey, nextTheme)
       setThemeState(nextTheme)
+      useUIStore.getState().setTheme(nextTheme)
     },
     [storageKey]
   )
@@ -168,6 +183,7 @@ export function ThemeProvider({
                 : "dark"
 
         localStorage.setItem(storageKey, nextTheme)
+        useUIStore.getState().setTheme(nextTheme)
         return nextTheme
       })
     }

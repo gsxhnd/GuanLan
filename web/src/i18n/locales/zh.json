@@ -48,13 +48,43 @@
       "description": "集中查看数据、任务和服务的异常告警。"
     },
     "system": {
-      "title": "系统",
+      "title": "系统与设置",
       "description": "查看服务健康状态，并配置主题与语言偏好。"
     }
   },
   "settings": {
     "theme": "主题",
-    "language": "语言"
+    "language": "语言",
+    "preferencesTitle": "偏好设置",
+    "themeDescription": "选择界面配色，或使用系统设置自动切换。",
+    "languageDescription": "切换界面显示语言。",
+    "themeLight": "浅色",
+    "themeDark": "深色",
+    "themeSystem": "跟随系统",
+    "languageZh": "简体中文",
+    "languageEn": "English",
+    "deploymentTitle": "部署配置",
+    "deployment": {
+      "dbPath": "数据库路径",
+      "logDir": "日志目录",
+      "scheduler": "任务调度",
+      "schedulerValue": "cron + 手动触发",
+      "mode": "部署模式",
+      "modeValue": "本地单用户"
+    },
+    "services": {
+      "api": "API 服务",
+      "apiUptime": "uptime 14d 6h",
+      "duckdb": "DuckDB",
+      "python": "Python 数据服务",
+      "pythonDetail": "TSLA 任务重试中"
+    },
+    "shortcutsTitle": "快捷入口",
+    "shortcuts": {
+      "logs": "查看任务日志",
+      "dataVersions": "数据版本管理",
+      "questions": "打开问题清单 (06-open-questions)"
+    }
   },
   "common": {
     "loading": "加载中...",
