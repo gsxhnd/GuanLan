@@ -47,6 +47,74 @@
         ]
       }
     },
+    "/api/data/indexes/{indexCode}/constituents": {
+      "get": {
+        "operationId": "DataService_ListIndexConstituents",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListIndexConstituentsResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "indexCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          }
+        ],
+        "tags": [
+          "DataService"
+        ]
+      }
+    },
+    "/api/data/indexes/{indexCode}/init": {
+      "post": {
+        "operationId": "DataService_InitTrainingIndex",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1Task"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "indexCode",
+            "in": "path",
+            "required": true,
+            "type": "string"
+          },
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/DataServiceInitTrainingIndexBody"
+            }
+          }
+        ],
+        "tags": [
+          "DataService"
+        ]
+      }
+    },
     "/api/data/stocks": {
       "get": {
         "operationId": "DataService_ListStocks",
@@ -768,6 +836,9 @@
     }
   },
   "definitions": {
+    "DataServiceInitTrainingIndexBody": {
+      "type": "object"
+    },
     "DataServiceSyncStockBody": {
       "type": "object"
     },
@@ -1054,6 +1125,9 @@
         },
         "dataVersion": {
           "type": "string"
+        },
+        "qualityStatus": {
+          "type": "string"
         }
       }
     },
@@ -1107,6 +1181,27 @@
             "type": "object",
             "$ref": "#/definitions/v1AssetSnapshot"
           }
+        }
+      }
+    },
+    "v1IndexConstituent": {
+      "type": "object",
+      "properties": {
+        "indexCode": {
+          "type": "string"
+        },
+        "stockCode": {
+          "type": "string"
+        },
+        "snapDate": {
+          "type": "string"
+        },
+        "weight": {
+          "type": "number",
+          "format": "double"
+        },
+        "isActive": {
+          "type": "boolean"
         }
       }
     },
@@ -1179,6 +1274,18 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Dividend"
+          }
+        }
+      }
+    },
+    "v1ListIndexConstituentsResponse": {
+      "type": "object",
+      "properties": {
+        "constituents": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1IndexConstituent"
           }
         }
       }

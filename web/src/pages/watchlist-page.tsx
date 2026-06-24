@@ -1,4 +1,4 @@
-import { useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import {
   ContentCard,
@@ -29,38 +29,41 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select"
-import {
-  INITIAL_WATCHLIST,
-  TRAINING_CODES,
-  type WatchlistEntry,
-} from "@/data/mock"
+import { api, type WatchlistItem } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
 import { marketLabel } from "@/lib/format"
 
 export function WatchlistPage() {
   const { showToast, Toast } = useToast()
-  const [pool, setPool] = useState<WatchlistEntry[]>(INITIAL_WATCHLIST)
+  const [pool, setPool] = useState<WatchlistItem[]>([])
   const [filter, setFilter] = useState("")
   const [addOpen, setAddOpen] = useState(false)
-  const [taskBanner, setTaskBanner] = useState<{
-    code: string
-    detail: string
-    status: "running" | "failed"
-    failureReason?: string
-  } | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [syncingCode, setSyncingCode] = useState<string | null>(null)
 
   const [formCode, setFormCode] = useState("")
   const [formMarket, setFormMarket] = useState<"A" | "US">("A")
   const [formTags, setFormTags] = useState("")
   const [formActive, setFormActive] = useState(true)
 
+  const loadPool = useCallback(async () => {
+    const res = await api.listWatchlist()
+    setPool(res.items ?? [])
+  }, [])
+
+  useEffect(() => {
+    loadPool()
+      .catch((err) => showToast(err instanceof Error ? err.message : "加载失败"))
+      .finally(() => setLoading(false))
+  }, [loadPool, showToast])
+
   const filtered = useMemo(() => {
     const q = filter.toLowerCase()
     return pool.filter(
       (s) =>
         !q ||
-        s.code.toLowerCase().includes(q) ||
-        s.name.toLowerCase().includes(q)
+        s.stockCode.toLowerCase().includes(q) ||
+        (s.notes ?? "").toLowerCase().includes(q)
     )
   }, [pool, filter])
 
@@ -71,73 +74,63 @@ export function WatchlistPage() {
     setFormActive(true)
   }
 
-  function handleAdd(e: React.FormEvent) {
+  async function handleAdd(e: React.FormEvent) {
     e.preventDefault()
     const code = formCode.trim().toUpperCase()
     if (!code) return
 
     setAddOpen(false)
-    const inTraining = TRAINING_CODES.has(code)
-
-    if (inTraining) {
-      setPool((prev) => [
-        {
-          code,
-          name: "—",
-          market: formMarket,
-          source: "训练数据",
-          completeness: "99%+",
-          updated: "刚刚",
-          active: formActive,
-        },
-        ...prev,
-      ])
-      showToast(`${code} 已加入 · DuckDB 直读可用`)
-    } else {
-      setPool((prev) => [
-        {
-          code,
-          name: "获取中…",
-          market: formMarket,
-          source: "手动添加",
-          completeness: "—",
-          updated: "—",
-          active: formActive,
-        },
-        ...prev,
-      ])
-      setTaskBanner({
-        code,
-        detail: "任务状态 running · 预计 2–5 分钟",
-        status: "running",
+    try {
+      const tags = formTags
+        .split(",")
+        .map((t) => t.trim())
+        .filter(Boolean)
+      const item = await api.addWatchlistItem({
+        stockCode: code,
+        market: formMarket,
+        tags,
+        isActive: formActive,
       })
-      showToast(`${code} 已创建数据获取任务`)
-
-      window.setTimeout(() => {
-        setPool((prev) =>
-          prev.map((s) =>
-            s.code === code
-              ? {
-                  ...s,
-                  name: code,
-                  completeness: "96.4%",
-                  updated: "刚刚",
-                }
-              : s
-          )
-        )
-        setTaskBanner(null)
-        showToast(`${code} 日频数据已就绪`)
-      }, 3500)
+      if (item.syncStatus === "ready") {
+        showToast(`${code} 已加入 · DuckDB 直读可用`)
+      } else {
+        setSyncingCode(code)
+        showToast(`${code} 已创建数据获取任务`)
+      }
+      await loadPool()
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "添加失败")
     }
-
     resetForm()
   }
 
-  function handleRemove(code: string) {
-    setPool((prev) => prev.filter((s) => s.code !== code))
-    showToast("已标记移除（历史数据保留）")
+  async function handleRemove(code: string) {
+    try {
+      await api.removeWatchlistItem(code)
+      showToast("已停用（历史数据保留）")
+      await loadPool()
+    } catch (err) {
+      showToast(err instanceof Error ? err.message : "移除失败")
+    }
   }
+
+  useEffect(() => {
+    if (!syncingCode) return
+    const timer = window.setInterval(async () => {
+      try {
+        const res = await api.listWatchlist()
+        const item = res.items?.find((i) => i.stockCode === syncingCode)
+        if (item?.syncStatus === "ready") {
+          setSyncingCode(null)
+          setPool(res.items ?? [])
+          showToast(`${syncingCode} 日频数据已就绪`)
+        }
+      } catch {
+        // ignore poll errors
+      }
+    }, 3000)
+    return () => window.clearInterval(timer)
+  }, [syncingCode, showToast])
 
   return (
     <div className="flex flex-col gap-6">
@@ -153,26 +146,12 @@ export function WatchlistPage() {
         }
       />
 
-      {taskBanner && (
+      {syncingCode && (
         <TaskStatusBanner
-          title={`数据获取 · ${taskBanner.code}`}
-          status={taskBanner.status}
-          detail={taskBanner.detail}
-          failureReason={taskBanner.failureReason}
+          title={`数据获取 · ${syncingCode}`}
+          status="running"
+          detail="任务进行中 · 后台调度执行"
           onViewLog={() => showToast("日志入口 · Phase 2 接入")}
-          onRetry={
-            taskBanner.status === "failed"
-              ? () => {
-                  setTaskBanner({
-                    ...taskBanner,
-                    status: "running",
-                    detail: "重试中 · 预计 2–5 分钟",
-                    failureReason: undefined,
-                  })
-                  showToast(`${taskBanner.code} 已重新触发获取任务`)
-                }
-              : undefined
-          }
         />
       )}
 
@@ -186,7 +165,7 @@ export function WatchlistPage() {
         action={
           <Input
             type="search"
-            placeholder="筛选代码或名称…"
+            placeholder="筛选代码…"
             className="w-48"
             value={filter}
             onChange={(e) => setFilter(e.target.value)}
@@ -195,54 +174,69 @@ export function WatchlistPage() {
         noPadding
         bodyClassName="p-0"
       >
-        {filtered.length === 0 ? (
+        {loading ? (
+          <EmptyState title="加载中…" />
+        ) : filtered.length === 0 ? (
           <EmptyState
             title="股票池为空"
             description="点击「添加股票」手动添加指定代码，纳入日频展示与每日分析。"
           />
         ) : (
-        <DataTable>
-          <DataTableHead>
-            <DataTableTh>代码</DataTableTh>
-            <DataTableTh>名称</DataTableTh>
-            <DataTableTh>市场</DataTableTh>
-            <DataTableTh>来源</DataTableTh>
-            <DataTableTh numeric>完整率</DataTableTh>
-            <DataTableTh>最近更新</DataTableTh>
-            <DataTableTh>分析</DataTableTh>
-            <DataTableTh className="text-right">操作</DataTableTh>
-          </DataTableHead>
-          <DataTableBody>
-            {filtered.map((stock) => (
-              <DataTableRow key={stock.code}>
-                <DataTableTd mono>{stock.code}</DataTableTd>
-                <DataTableTd>{stock.name}</DataTableTd>
-                <DataTableTd>{marketLabel(stock.market)}</DataTableTd>
-                <DataTableTd>{stock.source}</DataTableTd>
-                <DataTableTd numeric>{stock.completeness}</DataTableTd>
-                <DataTableTd mono>{stock.updated}</DataTableTd>
-                <DataTableTd>
-                  {stock.active ? (
-                    <StatusBadge variant="success" dot>
-                      启用
+          <DataTable>
+            <DataTableHead>
+              <DataTableTh>代码</DataTableTh>
+              <DataTableTh>市场</DataTableTh>
+              <DataTableTh>来源</DataTableTh>
+              <DataTableTh numeric>完整率</DataTableTh>
+              <DataTableTh>数据状态</DataTableTh>
+              <DataTableTh>分析</DataTableTh>
+              <DataTableTh className="text-right">操作</DataTableTh>
+            </DataTableHead>
+            <DataTableBody>
+              {filtered.map((stock) => (
+                <DataTableRow key={stock.stockCode}>
+                  <DataTableTd mono>{stock.stockCode}</DataTableTd>
+                  <DataTableTd>{marketLabel(stock.market as "A" | "US")}</DataTableTd>
+                  <DataTableTd>{stock.source}</DataTableTd>
+                  <DataTableTd numeric>
+                    {stock.completeness != null ? `${stock.completeness.toFixed(1)}%` : "—"}
+                  </DataTableTd>
+                  <DataTableTd>
+                    <StatusBadge
+                      variant={
+                        stock.syncStatus === "ready"
+                          ? "success"
+                          : stock.syncStatus === "syncing"
+                            ? "warn"
+                            : "muted"
+                      }
+                      dot={stock.syncStatus === "ready"}
+                    >
+                      {stock.syncStatus ?? "missing"}
                     </StatusBadge>
-                  ) : (
-                    <StatusBadge variant="muted">停用</StatusBadge>
-                  )}
-                </DataTableTd>
-                <DataTableTd className="text-right">
-                  <Button
-                    variant="ghost"
-                    size="sm"
-                    onClick={() => handleRemove(stock.code)}
-                  >
-                    移除
-                  </Button>
-                </DataTableTd>
-              </DataTableRow>
-            ))}
-          </DataTableBody>
-        </DataTable>
+                  </DataTableTd>
+                  <DataTableTd>
+                    {stock.isActive ? (
+                      <StatusBadge variant="success" dot>
+                        启用
+                      </StatusBadge>
+                    ) : (
+                      <StatusBadge variant="muted">停用</StatusBadge>
+                    )}
+                  </DataTableTd>
+                  <DataTableTd className="text-right">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => handleRemove(stock.stockCode)}
+                    >
+                      移除
+                    </Button>
+                  </DataTableTd>
+                </DataTableRow>
+              ))}
+            </DataTableBody>
+          </DataTable>
         )}
       </ContentCard>
 
@@ -303,11 +297,7 @@ export function WatchlistPage() {
               参与每日分析
             </label>
             <DialogFooter className="border-0 bg-transparent p-0">
-              <Button
-                type="button"
-                variant="secondary"
-                onClick={() => setAddOpen(false)}
-              >
+              <Button type="button" variant="secondary" onClick={() => setAddOpen(false)}>
                 取消
               </Button>
               <Button type="submit">确认添加</Button>

@@ -281,6 +281,21 @@ func (s *Store) ListPendingDataSyncTargets(ctx context.Context) ([]string, error
 	return codes, rows.Err()
 }
 
+// StockHasReadyData 判断 DuckDB 是否已有就绪日频数据。
+func (s *Store) StockHasReadyData(ctx context.Context, stockCode string) (bool, error) {
+	var status string
+	err := s.db.QueryRowContext(ctx, `
+		SELECT sync_status FROM stock_data_status WHERE stock_code = ?
+	`, stockCode).Scan(&status)
+	if err == sql.ErrNoRows {
+		return false, nil
+	}
+	if err != nil {
+		return false, fmt.Errorf("stock has ready data: %w", err)
+	}
+	return status == string(StockStatusReady), nil
+}
+
 func encodeTags(tags []string) (any, error) {
 	if len(tags) == 0 {
 		return nil, nil

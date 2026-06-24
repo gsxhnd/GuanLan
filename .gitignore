@@ -4,6 +4,16 @@ target/
 # Node.js
 node_modules/
 
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+*.egg-info/
+.venv/
+
 # IDE
 .idea/
 .vscode/

@@ -1,4 +1,5 @@
 export { ChartPlaceholder } from "./chart-placeholder"
+export { PriceVolumeChart } from "./price-volume-chart"
 export { ContentCard } from "./content-card"
 export { LogButton } from "./log-button"
 export { RetryButton } from "./retry-button"

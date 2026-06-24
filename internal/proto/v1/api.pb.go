@@ -2575,6 +2575,214 @@ func (x *ListIndexesResponse) GetIndexes() []*IndexDataset {
 	return nil
 }
 
+type IndexConstituent struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IndexCode     string                 `protobuf:"bytes,1,opt,name=index_code,json=indexCode,proto3" json:"index_code,omitempty"`
+	StockCode     string                 `protobuf:"bytes,2,opt,name=stock_code,json=stockCode,proto3" json:"stock_code,omitempty"`
+	SnapDate      string                 `protobuf:"bytes,3,opt,name=snap_date,json=snapDate,proto3" json:"snap_date,omitempty"`
+	Weight        float64                `protobuf:"fixed64,4,opt,name=weight,proto3" json:"weight,omitempty"`
+	IsActive      bool                   `protobuf:"varint,5,opt,name=is_active,json=isActive,proto3" json:"is_active,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *IndexConstituent) Reset() {
+	*x = IndexConstituent{}
+	mi := &file_v1_api_proto_msgTypes[38]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *IndexConstituent) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*IndexConstituent) ProtoMessage() {}
+
+func (x *IndexConstituent) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_api_proto_msgTypes[38]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use IndexConstituent.ProtoReflect.Descriptor instead.
+func (*IndexConstituent) Descriptor() ([]byte, []int) {
+	return file_v1_api_proto_rawDescGZIP(), []int{38}
+}
+
+func (x *IndexConstituent) GetIndexCode() string {
+	if x != nil {
+		return x.IndexCode
+	}
+	return ""
+}
+
+func (x *IndexConstituent) GetStockCode() string {
+	if x != nil {
+		return x.StockCode
+	}
+	return ""
+}
+
+func (x *IndexConstituent) GetSnapDate() string {
+	if x != nil {
+		return x.SnapDate
+	}
+	return ""
+}
+
+func (x *IndexConstituent) GetWeight() float64 {
+	if x != nil {
+		return x.Weight
+	}
+	return 0
+}
+
+func (x *IndexConstituent) GetIsActive() bool {
+	if x != nil {
+		return x.IsActive
+	}
+	return false
+}
+
+type ListIndexConstituentsRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IndexCode     string                 `protobuf:"bytes,1,opt,name=index_code,json=indexCode,proto3" json:"index_code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListIndexConstituentsRequest) Reset() {
+	*x = ListIndexConstituentsRequest{}
+	mi := &file_v1_api_proto_msgTypes[39]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListIndexConstituentsRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListIndexConstituentsRequest) ProtoMessage() {}
+
+func (x *ListIndexConstituentsRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_api_proto_msgTypes[39]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListIndexConstituentsRequest.ProtoReflect.Descriptor instead.
+func (*ListIndexConstituentsRequest) Descriptor() ([]byte, []int) {
+	return file_v1_api_proto_rawDescGZIP(), []int{39}
+}
+
+func (x *ListIndexConstituentsRequest) GetIndexCode() string {
+	if x != nil {
+		return x.IndexCode
+	}
+	return ""
+}
+
+type ListIndexConstituentsResponse struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	Constituents  []*IndexConstituent    `protobuf:"bytes,1,rep,name=constituents,proto3" json:"constituents,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *ListIndexConstituentsResponse) Reset() {
+	*x = ListIndexConstituentsResponse{}
+	mi := &file_v1_api_proto_msgTypes[40]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *ListIndexConstituentsResponse) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*ListIndexConstituentsResponse) ProtoMessage() {}
+
+func (x *ListIndexConstituentsResponse) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_api_proto_msgTypes[40]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use ListIndexConstituentsResponse.ProtoReflect.Descriptor instead.
+func (*ListIndexConstituentsResponse) Descriptor() ([]byte, []int) {
+	return file_v1_api_proto_rawDescGZIP(), []int{40}
+}
+
+func (x *ListIndexConstituentsResponse) GetConstituents() []*IndexConstituent {
+	if x != nil {
+		return x.Constituents
+	}
+	return nil
+}
+
+type InitTrainingIndexRequest struct {
+	state         protoimpl.MessageState `protogen:"open.v1"`
+	IndexCode     string                 `protobuf:"bytes,1,opt,name=index_code,json=indexCode,proto3" json:"index_code,omitempty"`
+	unknownFields protoimpl.UnknownFields
+	sizeCache     protoimpl.SizeCache
+}
+
+func (x *InitTrainingIndexRequest) Reset() {
+	*x = InitTrainingIndexRequest{}
+	mi := &file_v1_api_proto_msgTypes[41]
+	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+	ms.StoreMessageInfo(mi)
+}
+
+func (x *InitTrainingIndexRequest) String() string {
+	return protoimpl.X.MessageStringOf(x)
+}
+
+func (*InitTrainingIndexRequest) ProtoMessage() {}
+
+func (x *InitTrainingIndexRequest) ProtoReflect() protoreflect.Message {
+	mi := &file_v1_api_proto_msgTypes[41]
+	if x != nil {
+		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
+		if ms.LoadMessageInfo() == nil {
+			ms.StoreMessageInfo(mi)
+		}
+		return ms
+	}
+	return mi.MessageOf(x)
+}
+
+// Deprecated: Use InitTrainingIndexRequest.ProtoReflect.Descriptor instead.
+func (*InitTrainingIndexRequest) Descriptor() ([]byte, []int) {
+	return file_v1_api_proto_rawDescGZIP(), []int{41}
+}
+
+func (x *InitTrainingIndexRequest) GetIndexCode() string {
+	if x != nil {
+		return x.IndexCode
+	}
+	return ""
+}
+
 type StockListItem struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	StockCode     string                 `protobuf:"bytes,1,opt,name=stock_code,json=stockCode,proto3" json:"stock_code,omitempty"`
@@ -2595,7 +2803,7 @@ type StockListItem struct {
 
 func (x *StockListItem) Reset() {
 	*x = StockListItem{}
-	mi := &file_v1_api_proto_msgTypes[38]
+	mi := &file_v1_api_proto_msgTypes[42]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2607,7 +2815,7 @@ func (x *StockListItem) String() string {
 func (*StockListItem) ProtoMessage() {}
 
 func (x *StockListItem) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_api_proto_msgTypes[38]
+	mi := &file_v1_api_proto_msgTypes[42]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2620,7 +2828,7 @@ func (x *StockListItem) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StockListItem.ProtoReflect.Descriptor instead.
 func (*StockListItem) Descriptor() ([]byte, []int) {
-	return file_v1_api_proto_rawDescGZIP(), []int{38}
+	return file_v1_api_proto_rawDescGZIP(), []int{42}
 }
 
 func (x *StockListItem) GetStockCode() string {
@@ -2719,7 +2927,7 @@ type ListStocksRequest struct {
 
 func (x *ListStocksRequest) Reset() {
 	*x = ListStocksRequest{}
-	mi := &file_v1_api_proto_msgTypes[39]
+	mi := &file_v1_api_proto_msgTypes[43]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2731,7 +2939,7 @@ func (x *ListStocksRequest) String() string {
 func (*ListStocksRequest) ProtoMessage() {}
 
 func (x *ListStocksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_api_proto_msgTypes[39]
+	mi := &file_v1_api_proto_msgTypes[43]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2744,7 +2952,7 @@ func (x *ListStocksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStocksRequest.ProtoReflect.Descriptor instead.
 func (*ListStocksRequest) Descriptor() ([]byte, []int) {
-	return file_v1_api_proto_rawDescGZIP(), []int{39}
+	return file_v1_api_proto_rawDescGZIP(), []int{43}
 }
 
 func (x *ListStocksRequest) GetMarket() string {
@@ -2784,7 +2992,7 @@ type ListStocksResponse struct {
 
 func (x *ListStocksResponse) Reset() {
 	*x = ListStocksResponse{}
-	mi := &file_v1_api_proto_msgTypes[40]
+	mi := &file_v1_api_proto_msgTypes[44]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2796,7 +3004,7 @@ func (x *ListStocksResponse) String() string {
 func (*ListStocksResponse) ProtoMessage() {}
 
 func (x *ListStocksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_api_proto_msgTypes[40]
+	mi := &file_v1_api_proto_msgTypes[44]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2809,7 +3017,7 @@ func (x *ListStocksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListStocksResponse.ProtoReflect.Descriptor instead.
 func (*ListStocksResponse) Descriptor() ([]byte, []int) {
-	return file_v1_api_proto_rawDescGZIP(), []int{40}
+	return file_v1_api_proto_rawDescGZIP(), []int{44}
 }
 
 func (x *ListStocksResponse) GetStocks() []*StockListItem {
@@ -2831,13 +3039,14 @@ type DailyBar struct {
 	Volume        int64                  `protobuf:"varint,8,opt,name=volume,proto3" json:"volume,omitempty"`
 	Source        string                 `protobuf:"bytes,9,opt,name=source,proto3" json:"source,omitempty"`
 	DataVersion   string                 `protobuf:"bytes,10,opt,name=data_version,json=dataVersion,proto3" json:"data_version,omitempty"`
+	QualityStatus string                 `protobuf:"bytes,11,opt,name=quality_status,json=qualityStatus,proto3" json:"quality_status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DailyBar) Reset() {
 	*x = DailyBar{}
-	mi := &file_v1_api_proto_msgTypes[41]
+	mi := &file_v1_api_proto_msgTypes[45]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2849,7 +3058,7 @@ func (x *DailyBar) String() string {
 func (*DailyBar) ProtoMessage() {}
 
 func (x *DailyBar) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_api_proto_msgTypes[41]
+	mi := &file_v1_api_proto_msgTypes[45]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2862,7 +3071,7 @@ func (x *DailyBar) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DailyBar.ProtoReflect.Descriptor instead.
 func (*DailyBar) Descriptor() ([]byte, []int) {
-	return file_v1_api_proto_rawDescGZIP(), []int{41}
+	return file_v1_api_proto_rawDescGZIP(), []int{45}
 }
 
 func (x *DailyBar) GetStockCode() string {
@@ -2935,6 +3144,13 @@ func (x *DailyBar) GetDataVersion() string {
 	return ""
 }
 
+func (x *DailyBar) GetQualityStatus() string {
+	if x != nil {
+		return x.QualityStatus
+	}
+	return ""
+}
+
 type ListDailyBarsRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	StockCode     string                 `protobuf:"bytes,1,opt,name=stock_code,json=stockCode,proto3" json:"stock_code,omitempty"`
@@ -2947,7 +3163,7 @@ type ListDailyBarsRequest struct {
 
 func (x *ListDailyBarsRequest) Reset() {
 	*x = ListDailyBarsRequest{}
-	mi := &file_v1_api_proto_msgTypes[42]
+	mi := &file_v1_api_proto_msgTypes[46]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -2959,7 +3175,7 @@ func (x *ListDailyBarsRequest) String() string {
 func (*ListDailyBarsRequest) ProtoMessage() {}
 
 func (x *ListDailyBarsRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_api_proto_msgTypes[42]
+	mi := &file_v1_api_proto_msgTypes[46]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -2972,7 +3188,7 @@ func (x *ListDailyBarsRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDailyBarsRequest.ProtoReflect.Descriptor instead.
 func (*ListDailyBarsRequest) Descriptor() ([]byte, []int) {
-	return file_v1_api_proto_rawDescGZIP(), []int{42}
+	return file_v1_api_proto_rawDescGZIP(), []int{46}
 }
 
 func (x *ListDailyBarsRequest) GetStockCode() string {
@@ -3012,7 +3228,7 @@ type ListDailyBarsResponse struct {
 
 func (x *ListDailyBarsResponse) Reset() {
 	*x = ListDailyBarsResponse{}
-	mi := &file_v1_api_proto_msgTypes[43]
+	mi := &file_v1_api_proto_msgTypes[47]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3024,7 +3240,7 @@ func (x *ListDailyBarsResponse) String() string {
 func (*ListDailyBarsResponse) ProtoMessage() {}
 
 func (x *ListDailyBarsResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_api_proto_msgTypes[43]
+	mi := &file_v1_api_proto_msgTypes[47]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3037,7 +3253,7 @@ func (x *ListDailyBarsResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDailyBarsResponse.ProtoReflect.Descriptor instead.
 func (*ListDailyBarsResponse) Descriptor() ([]byte, []int) {
-	return file_v1_api_proto_rawDescGZIP(), []int{43}
+	return file_v1_api_proto_rawDescGZIP(), []int{47}
 }
 
 func (x *ListDailyBarsResponse) GetBars() []*DailyBar {
@@ -3056,7 +3272,7 @@ type SyncStockRequest struct {
 
 func (x *SyncStockRequest) Reset() {
 	*x = SyncStockRequest{}
-	mi := &file_v1_api_proto_msgTypes[44]
+	mi := &file_v1_api_proto_msgTypes[48]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3068,7 +3284,7 @@ func (x *SyncStockRequest) String() string {
 func (*SyncStockRequest) ProtoMessage() {}
 
 func (x *SyncStockRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_api_proto_msgTypes[44]
+	mi := &file_v1_api_proto_msgTypes[48]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3081,7 +3297,7 @@ func (x *SyncStockRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use SyncStockRequest.ProtoReflect.Descriptor instead.
 func (*SyncStockRequest) Descriptor() ([]byte, []int) {
-	return file_v1_api_proto_rawDescGZIP(), []int{44}
+	return file_v1_api_proto_rawDescGZIP(), []int{48}
 }
 
 func (x *SyncStockRequest) GetStockCode() string {
@@ -3100,7 +3316,7 @@ type ListDataTasksRequest struct {
 
 func (x *ListDataTasksRequest) Reset() {
 	*x = ListDataTasksRequest{}
-	mi := &file_v1_api_proto_msgTypes[45]
+	mi := &file_v1_api_proto_msgTypes[49]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3112,7 +3328,7 @@ func (x *ListDataTasksRequest) String() string {
 func (*ListDataTasksRequest) ProtoMessage() {}
 
 func (x *ListDataTasksRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_api_proto_msgTypes[45]
+	mi := &file_v1_api_proto_msgTypes[49]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3125,7 +3341,7 @@ func (x *ListDataTasksRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDataTasksRequest.ProtoReflect.Descriptor instead.
 func (*ListDataTasksRequest) Descriptor() ([]byte, []int) {
-	return file_v1_api_proto_rawDescGZIP(), []int{45}
+	return file_v1_api_proto_rawDescGZIP(), []int{49}
 }
 
 func (x *ListDataTasksRequest) GetLimit() int32 {
@@ -3144,7 +3360,7 @@ type ListDataTasksResponse struct {
 
 func (x *ListDataTasksResponse) Reset() {
 	*x = ListDataTasksResponse{}
-	mi := &file_v1_api_proto_msgTypes[46]
+	mi := &file_v1_api_proto_msgTypes[50]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -3156,7 +3372,7 @@ func (x *ListDataTasksResponse) String() string {
 func (*ListDataTasksResponse) ProtoMessage() {}
 
 func (x *ListDataTasksResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_v1_api_proto_msgTypes[46]
+	mi := &file_v1_api_proto_msgTypes[50]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -3169,7 +3385,7 @@ func (x *ListDataTasksResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ListDataTasksResponse.ProtoReflect.Descriptor instead.
 func (*ListDataTasksResponse) Descriptor() ([]byte, []int) {
-	return file_v1_api_proto_rawDescGZIP(), []int{46}
+	return file_v1_api_proto_rawDescGZIP(), []int{50}
 }
 
 func (x *ListDataTasksResponse) GetTasks() []*Task {
@@ -3415,7 +3631,23 @@ const file_v1_api_proto_rawDesc = "" +
 	"\vsync_status\x18\x06 \x01(\tR\n" +
 	"syncStatus\"I\n" +
 	"\x13ListIndexesResponse\x122\n" +
-	"\aindexes\x18\x01 \x03(\v2\x18.guanlan.v1.IndexDatasetR\aindexes\"\xe7\x02\n" +
+	"\aindexes\x18\x01 \x03(\v2\x18.guanlan.v1.IndexDatasetR\aindexes\"\xa2\x01\n" +
+	"\x10IndexConstituent\x12\x1d\n" +
+	"\n" +
+	"index_code\x18\x01 \x01(\tR\tindexCode\x12\x1d\n" +
+	"\n" +
+	"stock_code\x18\x02 \x01(\tR\tstockCode\x12\x1b\n" +
+	"\tsnap_date\x18\x03 \x01(\tR\bsnapDate\x12\x16\n" +
+	"\x06weight\x18\x04 \x01(\x01R\x06weight\x12\x1b\n" +
+	"\tis_active\x18\x05 \x01(\bR\bisActive\"=\n" +
+	"\x1cListIndexConstituentsRequest\x12\x1d\n" +
+	"\n" +
+	"index_code\x18\x01 \x01(\tR\tindexCode\"a\n" +
+	"\x1dListIndexConstituentsResponse\x12@\n" +
+	"\fconstituents\x18\x01 \x03(\v2\x1c.guanlan.v1.IndexConstituentR\fconstituents\"9\n" +
+	"\x18InitTrainingIndexRequest\x12\x1d\n" +
+	"\n" +
+	"index_code\x18\x01 \x01(\tR\tindexCode\"\xe7\x02\n" +
 	"\rStockListItem\x12\x1d\n" +
 	"\n" +
 	"stock_code\x18\x01 \x01(\tR\tstockCode\x12\x1d\n" +
@@ -3440,7 +3672,7 @@ const file_v1_api_proto_rawDesc = "" +
 	"\x06search\x18\x03 \x01(\tR\x06search\x12\x12\n" +
 	"\x04sort\x18\x04 \x01(\tR\x04sort\"G\n" +
 	"\x12ListStocksResponse\x121\n" +
-	"\x06stocks\x18\x01 \x03(\v2\x19.guanlan.v1.StockListItemR\x06stocks\"\x83\x02\n" +
+	"\x06stocks\x18\x01 \x03(\v2\x19.guanlan.v1.StockListItemR\x06stocks\"\xaa\x02\n" +
 	"\bDailyBar\x12\x1d\n" +
 	"\n" +
 	"stock_code\x18\x01 \x01(\tR\tstockCode\x12\x16\n" +
@@ -3454,7 +3686,8 @@ const file_v1_api_proto_rawDesc = "" +
 	"\x06volume\x18\b \x01(\x03R\x06volume\x12\x16\n" +
 	"\x06source\x18\t \x01(\tR\x06source\x12!\n" +
 	"\fdata_version\x18\n" +
-	" \x01(\tR\vdataVersion\"\x85\x01\n" +
+	" \x01(\tR\vdataVersion\x12%\n" +
+	"\x0equality_status\x18\v \x01(\tR\rqualityStatus\"\x85\x01\n" +
 	"\x14ListDailyBarsRequest\x12\x1d\n" +
 	"\n" +
 	"stock_code\x18\x01 \x01(\tR\tstockCode\x12\x1d\n" +
@@ -3492,9 +3725,11 @@ const file_v1_api_proto_rawDesc = "" +
 	"\x0fCreateValuation\x12\".guanlan.v1.CreateValuationRequest\x1a\x15.guanlan.v1.Valuation\"$\x82\xd3\xe4\x93\x02\x1e:\x01*\"\x19/api/portfolio/valuations\x12z\n" +
 	"\x0eListValuations\x12!.guanlan.v1.ListValuationsRequest\x1a\".guanlan.v1.ListValuationsResponse\"!\x82\xd3\xe4\x93\x02\x1b\x12\x19/api/portfolio/valuations\x12g\n" +
 	"\tGetAssets\x12\x1c.guanlan.v1.GetAssetsRequest\x1a\x1d.guanlan.v1.GetAssetsResponse\"\x1d\x82\xd3\xe4\x93\x02\x17\x12\x15/api/portfolio/assets\x12v\n" +
-	"\x0fGetAnnualReview\x12\".guanlan.v1.GetAnnualReviewRequest\x1a\x18.guanlan.v1.AnnualReview\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/portfolio/annual-reviews2\xb6\x04\n" +
+	"\x0fGetAnnualReview\x12\".guanlan.v1.GetAnnualReviewRequest\x1a\x18.guanlan.v1.AnnualReview\"%\x82\xd3\xe4\x93\x02\x1f\x12\x1d/api/portfolio/annual-reviews2\xd7\x06\n" +
 	"\vDataService\x12\\\n" +
-	"\vListIndexes\x12\x11.guanlan.v1.Empty\x1a\x1f.guanlan.v1.ListIndexesResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/data/indexes\x12e\n" +
+	"\vListIndexes\x12\x11.guanlan.v1.Empty\x1a\x1f.guanlan.v1.ListIndexesResponse\"\x19\x82\xd3\xe4\x93\x02\x13\x12\x11/api/data/indexes\x12\xa1\x01\n" +
+	"\x15ListIndexConstituents\x12(.guanlan.v1.ListIndexConstituentsRequest\x1a).guanlan.v1.ListIndexConstituentsResponse\"3\x82\xd3\xe4\x93\x02-\x12+/api/data/indexes/{index_code}/constituents\x12{\n" +
+	"\x11InitTrainingIndex\x12$.guanlan.v1.InitTrainingIndexRequest\x1a\x10.guanlan.v1.Task\".\x82\xd3\xe4\x93\x02(:\x01*\"#/api/data/indexes/{index_code}/init\x12e\n" +
 	"\n" +
 	"ListStocks\x12\x1d.guanlan.v1.ListStocksRequest\x1a\x1e.guanlan.v1.ListStocksResponse\"\x18\x82\xd3\xe4\x93\x02\x12\x12\x10/api/data/stocks\x12\x86\x01\n" +
 	"\rListDailyBars\x12 .guanlan.v1.ListDailyBarsRequest\x1a!.guanlan.v1.ListDailyBarsResponse\"0\x82\xd3\xe4\x93\x02*\x12(/api/data/stocks/{stock_code}/daily-bars\x12j\n" +
@@ -3516,132 +3751,141 @@ func file_v1_api_proto_rawDescGZIP() []byte {
 	return file_v1_api_proto_rawDescData
 }
 
-var file_v1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 47)
+var file_v1_api_proto_msgTypes = make([]protoimpl.MessageInfo, 51)
 var file_v1_api_proto_goTypes = []any{
-	(*Empty)(nil),                      // 0: guanlan.v1.Empty
-	(*Task)(nil),                       // 1: guanlan.v1.Task
-	(*ListTasksRequest)(nil),           // 2: guanlan.v1.ListTasksRequest
-	(*ListTasksResponse)(nil),          // 3: guanlan.v1.ListTasksResponse
-	(*GetTaskRequest)(nil),             // 4: guanlan.v1.GetTaskRequest
-	(*RetryTaskRequest)(nil),           // 5: guanlan.v1.RetryTaskRequest
-	(*RetryTaskResponse)(nil),          // 6: guanlan.v1.RetryTaskResponse
-	(*WatchlistItem)(nil),              // 7: guanlan.v1.WatchlistItem
-	(*ListWatchlistRequest)(nil),       // 8: guanlan.v1.ListWatchlistRequest
-	(*ListWatchlistResponse)(nil),      // 9: guanlan.v1.ListWatchlistResponse
-	(*AddWatchlistItemRequest)(nil),    // 10: guanlan.v1.AddWatchlistItemRequest
-	(*RemoveWatchlistItemRequest)(nil), // 11: guanlan.v1.RemoveWatchlistItemRequest
-	(*Trade)(nil),                      // 12: guanlan.v1.Trade
-	(*CreateTradeRequest)(nil),         // 13: guanlan.v1.CreateTradeRequest
-	(*ListTradesRequest)(nil),          // 14: guanlan.v1.ListTradesRequest
-	(*ListTradesResponse)(nil),         // 15: guanlan.v1.ListTradesResponse
-	(*Dividend)(nil),                   // 16: guanlan.v1.Dividend
-	(*CreateDividendRequest)(nil),      // 17: guanlan.v1.CreateDividendRequest
-	(*ListDividendsRequest)(nil),       // 18: guanlan.v1.ListDividendsRequest
-	(*ListDividendsResponse)(nil),      // 19: guanlan.v1.ListDividendsResponse
-	(*CashFlow)(nil),                   // 20: guanlan.v1.CashFlow
-	(*CreateCashFlowRequest)(nil),      // 21: guanlan.v1.CreateCashFlowRequest
-	(*ListCashFlowsRequest)(nil),       // 22: guanlan.v1.ListCashFlowsRequest
-	(*ListCashFlowsResponse)(nil),      // 23: guanlan.v1.ListCashFlowsResponse
-	(*Position)(nil),                   // 24: guanlan.v1.Position
-	(*ListPositionsResponse)(nil),      // 25: guanlan.v1.ListPositionsResponse
-	(*Valuation)(nil),                  // 26: guanlan.v1.Valuation
-	(*CreateValuationRequest)(nil),     // 27: guanlan.v1.CreateValuationRequest
-	(*ListValuationsRequest)(nil),      // 28: guanlan.v1.ListValuationsRequest
-	(*ListValuationsResponse)(nil),     // 29: guanlan.v1.ListValuationsResponse
-	(*AssetSnapshot)(nil),              // 30: guanlan.v1.AssetSnapshot
-	(*GetAssetsRequest)(nil),           // 31: guanlan.v1.GetAssetsRequest
-	(*GetAssetsResponse)(nil),          // 32: guanlan.v1.GetAssetsResponse
-	(*StockContribution)(nil),          // 33: guanlan.v1.StockContribution
-	(*AnnualReview)(nil),               // 34: guanlan.v1.AnnualReview
-	(*GetAnnualReviewRequest)(nil),     // 35: guanlan.v1.GetAnnualReviewRequest
-	(*IndexDataset)(nil),               // 36: guanlan.v1.IndexDataset
-	(*ListIndexesResponse)(nil),        // 37: guanlan.v1.ListIndexesResponse
-	(*StockListItem)(nil),              // 38: guanlan.v1.StockListItem
-	(*ListStocksRequest)(nil),          // 39: guanlan.v1.ListStocksRequest
-	(*ListStocksResponse)(nil),         // 40: guanlan.v1.ListStocksResponse
-	(*DailyBar)(nil),                   // 41: guanlan.v1.DailyBar
-	(*ListDailyBarsRequest)(nil),       // 42: guanlan.v1.ListDailyBarsRequest
-	(*ListDailyBarsResponse)(nil),      // 43: guanlan.v1.ListDailyBarsResponse
-	(*SyncStockRequest)(nil),           // 44: guanlan.v1.SyncStockRequest
-	(*ListDataTasksRequest)(nil),       // 45: guanlan.v1.ListDataTasksRequest
-	(*ListDataTasksResponse)(nil),      // 46: guanlan.v1.ListDataTasksResponse
-	(*timestamppb.Timestamp)(nil),      // 47: google.protobuf.Timestamp
+	(*Empty)(nil),                         // 0: guanlan.v1.Empty
+	(*Task)(nil),                          // 1: guanlan.v1.Task
+	(*ListTasksRequest)(nil),              // 2: guanlan.v1.ListTasksRequest
+	(*ListTasksResponse)(nil),             // 3: guanlan.v1.ListTasksResponse
+	(*GetTaskRequest)(nil),                // 4: guanlan.v1.GetTaskRequest
+	(*RetryTaskRequest)(nil),              // 5: guanlan.v1.RetryTaskRequest
+	(*RetryTaskResponse)(nil),             // 6: guanlan.v1.RetryTaskResponse
+	(*WatchlistItem)(nil),                 // 7: guanlan.v1.WatchlistItem
+	(*ListWatchlistRequest)(nil),          // 8: guanlan.v1.ListWatchlistRequest
+	(*ListWatchlistResponse)(nil),         // 9: guanlan.v1.ListWatchlistResponse
+	(*AddWatchlistItemRequest)(nil),       // 10: guanlan.v1.AddWatchlistItemRequest
+	(*RemoveWatchlistItemRequest)(nil),    // 11: guanlan.v1.RemoveWatchlistItemRequest
+	(*Trade)(nil),                         // 12: guanlan.v1.Trade
+	(*CreateTradeRequest)(nil),            // 13: guanlan.v1.CreateTradeRequest
+	(*ListTradesRequest)(nil),             // 14: guanlan.v1.ListTradesRequest
+	(*ListTradesResponse)(nil),            // 15: guanlan.v1.ListTradesResponse
+	(*Dividend)(nil),                      // 16: guanlan.v1.Dividend
+	(*CreateDividendRequest)(nil),         // 17: guanlan.v1.CreateDividendRequest
+	(*ListDividendsRequest)(nil),          // 18: guanlan.v1.ListDividendsRequest
+	(*ListDividendsResponse)(nil),         // 19: guanlan.v1.ListDividendsResponse
+	(*CashFlow)(nil),                      // 20: guanlan.v1.CashFlow
+	(*CreateCashFlowRequest)(nil),         // 21: guanlan.v1.CreateCashFlowRequest
+	(*ListCashFlowsRequest)(nil),          // 22: guanlan.v1.ListCashFlowsRequest
+	(*ListCashFlowsResponse)(nil),         // 23: guanlan.v1.ListCashFlowsResponse
+	(*Position)(nil),                      // 24: guanlan.v1.Position
+	(*ListPositionsResponse)(nil),         // 25: guanlan.v1.ListPositionsResponse
+	(*Valuation)(nil),                     // 26: guanlan.v1.Valuation
+	(*CreateValuationRequest)(nil),        // 27: guanlan.v1.CreateValuationRequest
+	(*ListValuationsRequest)(nil),         // 28: guanlan.v1.ListValuationsRequest
+	(*ListValuationsResponse)(nil),        // 29: guanlan.v1.ListValuationsResponse
+	(*AssetSnapshot)(nil),                 // 30: guanlan.v1.AssetSnapshot
+	(*GetAssetsRequest)(nil),              // 31: guanlan.v1.GetAssetsRequest
+	(*GetAssetsResponse)(nil),             // 32: guanlan.v1.GetAssetsResponse
+	(*StockContribution)(nil),             // 33: guanlan.v1.StockContribution
+	(*AnnualReview)(nil),                  // 34: guanlan.v1.AnnualReview
+	(*GetAnnualReviewRequest)(nil),        // 35: guanlan.v1.GetAnnualReviewRequest
+	(*IndexDataset)(nil),                  // 36: guanlan.v1.IndexDataset
+	(*ListIndexesResponse)(nil),           // 37: guanlan.v1.ListIndexesResponse
+	(*IndexConstituent)(nil),              // 38: guanlan.v1.IndexConstituent
+	(*ListIndexConstituentsRequest)(nil),  // 39: guanlan.v1.ListIndexConstituentsRequest
+	(*ListIndexConstituentsResponse)(nil), // 40: guanlan.v1.ListIndexConstituentsResponse
+	(*InitTrainingIndexRequest)(nil),      // 41: guanlan.v1.InitTrainingIndexRequest
+	(*StockListItem)(nil),                 // 42: guanlan.v1.StockListItem
+	(*ListStocksRequest)(nil),             // 43: guanlan.v1.ListStocksRequest
+	(*ListStocksResponse)(nil),            // 44: guanlan.v1.ListStocksResponse
+	(*DailyBar)(nil),                      // 45: guanlan.v1.DailyBar
+	(*ListDailyBarsRequest)(nil),          // 46: guanlan.v1.ListDailyBarsRequest
+	(*ListDailyBarsResponse)(nil),         // 47: guanlan.v1.ListDailyBarsResponse
+	(*SyncStockRequest)(nil),              // 48: guanlan.v1.SyncStockRequest
+	(*ListDataTasksRequest)(nil),          // 49: guanlan.v1.ListDataTasksRequest
+	(*ListDataTasksResponse)(nil),         // 50: guanlan.v1.ListDataTasksResponse
+	(*timestamppb.Timestamp)(nil),         // 51: google.protobuf.Timestamp
 }
 var file_v1_api_proto_depIdxs = []int32{
-	47, // 0: guanlan.v1.Task.created_at:type_name -> google.protobuf.Timestamp
-	47, // 1: guanlan.v1.Task.started_at:type_name -> google.protobuf.Timestamp
-	47, // 2: guanlan.v1.Task.ended_at:type_name -> google.protobuf.Timestamp
+	51, // 0: guanlan.v1.Task.created_at:type_name -> google.protobuf.Timestamp
+	51, // 1: guanlan.v1.Task.started_at:type_name -> google.protobuf.Timestamp
+	51, // 2: guanlan.v1.Task.ended_at:type_name -> google.protobuf.Timestamp
 	1,  // 3: guanlan.v1.ListTasksResponse.tasks:type_name -> guanlan.v1.Task
 	1,  // 4: guanlan.v1.RetryTaskResponse.task:type_name -> guanlan.v1.Task
-	47, // 5: guanlan.v1.WatchlistItem.added_at:type_name -> google.protobuf.Timestamp
-	47, // 6: guanlan.v1.WatchlistItem.removed_at:type_name -> google.protobuf.Timestamp
-	47, // 7: guanlan.v1.WatchlistItem.last_action_at:type_name -> google.protobuf.Timestamp
+	51, // 5: guanlan.v1.WatchlistItem.added_at:type_name -> google.protobuf.Timestamp
+	51, // 6: guanlan.v1.WatchlistItem.removed_at:type_name -> google.protobuf.Timestamp
+	51, // 7: guanlan.v1.WatchlistItem.last_action_at:type_name -> google.protobuf.Timestamp
 	7,  // 8: guanlan.v1.ListWatchlistResponse.items:type_name -> guanlan.v1.WatchlistItem
-	47, // 9: guanlan.v1.Trade.created_at:type_name -> google.protobuf.Timestamp
+	51, // 9: guanlan.v1.Trade.created_at:type_name -> google.protobuf.Timestamp
 	12, // 10: guanlan.v1.ListTradesResponse.trades:type_name -> guanlan.v1.Trade
-	47, // 11: guanlan.v1.Dividend.created_at:type_name -> google.protobuf.Timestamp
+	51, // 11: guanlan.v1.Dividend.created_at:type_name -> google.protobuf.Timestamp
 	16, // 12: guanlan.v1.ListDividendsResponse.dividends:type_name -> guanlan.v1.Dividend
-	47, // 13: guanlan.v1.CashFlow.created_at:type_name -> google.protobuf.Timestamp
+	51, // 13: guanlan.v1.CashFlow.created_at:type_name -> google.protobuf.Timestamp
 	20, // 14: guanlan.v1.ListCashFlowsResponse.cash_flows:type_name -> guanlan.v1.CashFlow
 	24, // 15: guanlan.v1.ListPositionsResponse.positions:type_name -> guanlan.v1.Position
 	26, // 16: guanlan.v1.ListValuationsResponse.valuations:type_name -> guanlan.v1.Valuation
 	30, // 17: guanlan.v1.GetAssetsResponse.snapshots:type_name -> guanlan.v1.AssetSnapshot
 	33, // 18: guanlan.v1.AnnualReview.by_stock:type_name -> guanlan.v1.StockContribution
-	47, // 19: guanlan.v1.IndexDataset.last_sync_time:type_name -> google.protobuf.Timestamp
+	51, // 19: guanlan.v1.IndexDataset.last_sync_time:type_name -> google.protobuf.Timestamp
 	36, // 20: guanlan.v1.ListIndexesResponse.indexes:type_name -> guanlan.v1.IndexDataset
-	47, // 21: guanlan.v1.StockListItem.last_update:type_name -> google.protobuf.Timestamp
-	38, // 22: guanlan.v1.ListStocksResponse.stocks:type_name -> guanlan.v1.StockListItem
-	41, // 23: guanlan.v1.ListDailyBarsResponse.bars:type_name -> guanlan.v1.DailyBar
-	1,  // 24: guanlan.v1.ListDataTasksResponse.tasks:type_name -> guanlan.v1.Task
-	2,  // 25: guanlan.v1.TaskService.ListTasks:input_type -> guanlan.v1.ListTasksRequest
-	4,  // 26: guanlan.v1.TaskService.GetTask:input_type -> guanlan.v1.GetTaskRequest
-	5,  // 27: guanlan.v1.TaskService.RetryTask:input_type -> guanlan.v1.RetryTaskRequest
-	8,  // 28: guanlan.v1.WatchlistService.ListWatchlist:input_type -> guanlan.v1.ListWatchlistRequest
-	10, // 29: guanlan.v1.WatchlistService.AddWatchlistItem:input_type -> guanlan.v1.AddWatchlistItemRequest
-	11, // 30: guanlan.v1.WatchlistService.RemoveWatchlistItem:input_type -> guanlan.v1.RemoveWatchlistItemRequest
-	13, // 31: guanlan.v1.PortfolioService.CreateTrade:input_type -> guanlan.v1.CreateTradeRequest
-	14, // 32: guanlan.v1.PortfolioService.ListTrades:input_type -> guanlan.v1.ListTradesRequest
-	17, // 33: guanlan.v1.PortfolioService.CreateDividend:input_type -> guanlan.v1.CreateDividendRequest
-	18, // 34: guanlan.v1.PortfolioService.ListDividends:input_type -> guanlan.v1.ListDividendsRequest
-	21, // 35: guanlan.v1.PortfolioService.CreateCashFlow:input_type -> guanlan.v1.CreateCashFlowRequest
-	22, // 36: guanlan.v1.PortfolioService.ListCashFlows:input_type -> guanlan.v1.ListCashFlowsRequest
-	0,  // 37: guanlan.v1.PortfolioService.ListPositions:input_type -> guanlan.v1.Empty
-	27, // 38: guanlan.v1.PortfolioService.CreateValuation:input_type -> guanlan.v1.CreateValuationRequest
-	28, // 39: guanlan.v1.PortfolioService.ListValuations:input_type -> guanlan.v1.ListValuationsRequest
-	31, // 40: guanlan.v1.PortfolioService.GetAssets:input_type -> guanlan.v1.GetAssetsRequest
-	35, // 41: guanlan.v1.PortfolioService.GetAnnualReview:input_type -> guanlan.v1.GetAnnualReviewRequest
-	0,  // 42: guanlan.v1.DataService.ListIndexes:input_type -> guanlan.v1.Empty
-	39, // 43: guanlan.v1.DataService.ListStocks:input_type -> guanlan.v1.ListStocksRequest
-	42, // 44: guanlan.v1.DataService.ListDailyBars:input_type -> guanlan.v1.ListDailyBarsRequest
-	44, // 45: guanlan.v1.DataService.SyncStock:input_type -> guanlan.v1.SyncStockRequest
-	45, // 46: guanlan.v1.DataService.ListDataTasks:input_type -> guanlan.v1.ListDataTasksRequest
-	3,  // 47: guanlan.v1.TaskService.ListTasks:output_type -> guanlan.v1.ListTasksResponse
-	1,  // 48: guanlan.v1.TaskService.GetTask:output_type -> guanlan.v1.Task
-	6,  // 49: guanlan.v1.TaskService.RetryTask:output_type -> guanlan.v1.RetryTaskResponse
-	9,  // 50: guanlan.v1.WatchlistService.ListWatchlist:output_type -> guanlan.v1.ListWatchlistResponse
-	7,  // 51: guanlan.v1.WatchlistService.AddWatchlistItem:output_type -> guanlan.v1.WatchlistItem
-	7,  // 52: guanlan.v1.WatchlistService.RemoveWatchlistItem:output_type -> guanlan.v1.WatchlistItem
-	12, // 53: guanlan.v1.PortfolioService.CreateTrade:output_type -> guanlan.v1.Trade
-	15, // 54: guanlan.v1.PortfolioService.ListTrades:output_type -> guanlan.v1.ListTradesResponse
-	16, // 55: guanlan.v1.PortfolioService.CreateDividend:output_type -> guanlan.v1.Dividend
-	19, // 56: guanlan.v1.PortfolioService.ListDividends:output_type -> guanlan.v1.ListDividendsResponse
-	20, // 57: guanlan.v1.PortfolioService.CreateCashFlow:output_type -> guanlan.v1.CashFlow
-	23, // 58: guanlan.v1.PortfolioService.ListCashFlows:output_type -> guanlan.v1.ListCashFlowsResponse
-	25, // 59: guanlan.v1.PortfolioService.ListPositions:output_type -> guanlan.v1.ListPositionsResponse
-	26, // 60: guanlan.v1.PortfolioService.CreateValuation:output_type -> guanlan.v1.Valuation
-	29, // 61: guanlan.v1.PortfolioService.ListValuations:output_type -> guanlan.v1.ListValuationsResponse
-	32, // 62: guanlan.v1.PortfolioService.GetAssets:output_type -> guanlan.v1.GetAssetsResponse
-	34, // 63: guanlan.v1.PortfolioService.GetAnnualReview:output_type -> guanlan.v1.AnnualReview
-	37, // 64: guanlan.v1.DataService.ListIndexes:output_type -> guanlan.v1.ListIndexesResponse
-	40, // 65: guanlan.v1.DataService.ListStocks:output_type -> guanlan.v1.ListStocksResponse
-	43, // 66: guanlan.v1.DataService.ListDailyBars:output_type -> guanlan.v1.ListDailyBarsResponse
-	1,  // 67: guanlan.v1.DataService.SyncStock:output_type -> guanlan.v1.Task
-	46, // 68: guanlan.v1.DataService.ListDataTasks:output_type -> guanlan.v1.ListDataTasksResponse
-	47, // [47:69] is the sub-list for method output_type
-	25, // [25:47] is the sub-list for method input_type
-	25, // [25:25] is the sub-list for extension type_name
-	25, // [25:25] is the sub-list for extension extendee
-	0,  // [0:25] is the sub-list for field type_name
+	38, // 21: guanlan.v1.ListIndexConstituentsResponse.constituents:type_name -> guanlan.v1.IndexConstituent
+	51, // 22: guanlan.v1.StockListItem.last_update:type_name -> google.protobuf.Timestamp
+	42, // 23: guanlan.v1.ListStocksResponse.stocks:type_name -> guanlan.v1.StockListItem
+	45, // 24: guanlan.v1.ListDailyBarsResponse.bars:type_name -> guanlan.v1.DailyBar
+	1,  // 25: guanlan.v1.ListDataTasksResponse.tasks:type_name -> guanlan.v1.Task
+	2,  // 26: guanlan.v1.TaskService.ListTasks:input_type -> guanlan.v1.ListTasksRequest
+	4,  // 27: guanlan.v1.TaskService.GetTask:input_type -> guanlan.v1.GetTaskRequest
+	5,  // 28: guanlan.v1.TaskService.RetryTask:input_type -> guanlan.v1.RetryTaskRequest
+	8,  // 29: guanlan.v1.WatchlistService.ListWatchlist:input_type -> guanlan.v1.ListWatchlistRequest
+	10, // 30: guanlan.v1.WatchlistService.AddWatchlistItem:input_type -> guanlan.v1.AddWatchlistItemRequest
+	11, // 31: guanlan.v1.WatchlistService.RemoveWatchlistItem:input_type -> guanlan.v1.RemoveWatchlistItemRequest
+	13, // 32: guanlan.v1.PortfolioService.CreateTrade:input_type -> guanlan.v1.CreateTradeRequest
+	14, // 33: guanlan.v1.PortfolioService.ListTrades:input_type -> guanlan.v1.ListTradesRequest
+	17, // 34: guanlan.v1.PortfolioService.CreateDividend:input_type -> guanlan.v1.CreateDividendRequest
+	18, // 35: guanlan.v1.PortfolioService.ListDividends:input_type -> guanlan.v1.ListDividendsRequest
+	21, // 36: guanlan.v1.PortfolioService.CreateCashFlow:input_type -> guanlan.v1.CreateCashFlowRequest
+	22, // 37: guanlan.v1.PortfolioService.ListCashFlows:input_type -> guanlan.v1.ListCashFlowsRequest
+	0,  // 38: guanlan.v1.PortfolioService.ListPositions:input_type -> guanlan.v1.Empty
+	27, // 39: guanlan.v1.PortfolioService.CreateValuation:input_type -> guanlan.v1.CreateValuationRequest
+	28, // 40: guanlan.v1.PortfolioService.ListValuations:input_type -> guanlan.v1.ListValuationsRequest
+	31, // 41: guanlan.v1.PortfolioService.GetAssets:input_type -> guanlan.v1.GetAssetsRequest
+	35, // 42: guanlan.v1.PortfolioService.GetAnnualReview:input_type -> guanlan.v1.GetAnnualReviewRequest
+	0,  // 43: guanlan.v1.DataService.ListIndexes:input_type -> guanlan.v1.Empty
+	39, // 44: guanlan.v1.DataService.ListIndexConstituents:input_type -> guanlan.v1.ListIndexConstituentsRequest
+	41, // 45: guanlan.v1.DataService.InitTrainingIndex:input_type -> guanlan.v1.InitTrainingIndexRequest
+	43, // 46: guanlan.v1.DataService.ListStocks:input_type -> guanlan.v1.ListStocksRequest
+	46, // 47: guanlan.v1.DataService.ListDailyBars:input_type -> guanlan.v1.ListDailyBarsRequest
+	48, // 48: guanlan.v1.DataService.SyncStock:input_type -> guanlan.v1.SyncStockRequest
+	49, // 49: guanlan.v1.DataService.ListDataTasks:input_type -> guanlan.v1.ListDataTasksRequest
+	3,  // 50: guanlan.v1.TaskService.ListTasks:output_type -> guanlan.v1.ListTasksResponse
+	1,  // 51: guanlan.v1.TaskService.GetTask:output_type -> guanlan.v1.Task
+	6,  // 52: guanlan.v1.TaskService.RetryTask:output_type -> guanlan.v1.RetryTaskResponse
+	9,  // 53: guanlan.v1.WatchlistService.ListWatchlist:output_type -> guanlan.v1.ListWatchlistResponse
+	7,  // 54: guanlan.v1.WatchlistService.AddWatchlistItem:output_type -> guanlan.v1.WatchlistItem
+	7,  // 55: guanlan.v1.WatchlistService.RemoveWatchlistItem:output_type -> guanlan.v1.WatchlistItem
+	12, // 56: guanlan.v1.PortfolioService.CreateTrade:output_type -> guanlan.v1.Trade
+	15, // 57: guanlan.v1.PortfolioService.ListTrades:output_type -> guanlan.v1.ListTradesResponse
+	16, // 58: guanlan.v1.PortfolioService.CreateDividend:output_type -> guanlan.v1.Dividend
+	19, // 59: guanlan.v1.PortfolioService.ListDividends:output_type -> guanlan.v1.ListDividendsResponse
+	20, // 60: guanlan.v1.PortfolioService.CreateCashFlow:output_type -> guanlan.v1.CashFlow
+	23, // 61: guanlan.v1.PortfolioService.ListCashFlows:output_type -> guanlan.v1.ListCashFlowsResponse
+	25, // 62: guanlan.v1.PortfolioService.ListPositions:output_type -> guanlan.v1.ListPositionsResponse
+	26, // 63: guanlan.v1.PortfolioService.CreateValuation:output_type -> guanlan.v1.Valuation
+	29, // 64: guanlan.v1.PortfolioService.ListValuations:output_type -> guanlan.v1.ListValuationsResponse
+	32, // 65: guanlan.v1.PortfolioService.GetAssets:output_type -> guanlan.v1.GetAssetsResponse
+	34, // 66: guanlan.v1.PortfolioService.GetAnnualReview:output_type -> guanlan.v1.AnnualReview
+	37, // 67: guanlan.v1.DataService.ListIndexes:output_type -> guanlan.v1.ListIndexesResponse
+	40, // 68: guanlan.v1.DataService.ListIndexConstituents:output_type -> guanlan.v1.ListIndexConstituentsResponse
+	1,  // 69: guanlan.v1.DataService.InitTrainingIndex:output_type -> guanlan.v1.Task
+	44, // 70: guanlan.v1.DataService.ListStocks:output_type -> guanlan.v1.ListStocksResponse
+	47, // 71: guanlan.v1.DataService.ListDailyBars:output_type -> guanlan.v1.ListDailyBarsResponse
+	1,  // 72: guanlan.v1.DataService.SyncStock:output_type -> guanlan.v1.Task
+	50, // 73: guanlan.v1.DataService.ListDataTasks:output_type -> guanlan.v1.ListDataTasksResponse
+	50, // [50:74] is the sub-list for method output_type
+	26, // [26:50] is the sub-list for method input_type
+	26, // [26:26] is the sub-list for extension type_name
+	26, // [26:26] is the sub-list for extension extendee
+	0,  // [0:26] is the sub-list for field type_name
 }
 
 func init() { file_v1_api_proto_init() }
@@ -3655,7 +3899,7 @@ func file_v1_api_proto_init() {
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
 			RawDescriptor: unsafe.Slice(unsafe.StringData(file_v1_api_proto_rawDesc), len(file_v1_api_proto_rawDesc)),
 			NumEnums:      0,
-			NumMessages:   47,
+			NumMessages:   51,
 			NumExtensions: 0,
 			NumServices:   4,
 		},

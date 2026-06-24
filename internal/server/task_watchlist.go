@@ -4,13 +4,15 @@ import (
 	"context"
 
 	"github.com/gsxhnd/guanlan/internal/data"
+	"github.com/gsxhnd/guanlan/internal/task"
 	pb "github.com/gsxhnd/guanlan/internal/proto/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type Services struct {
-	Store *data.Store
+	Store  *data.Store
+	Python task.PythonSyncConfig
 }
 
 func (s *Services) toTask(t data.DataSyncTask) *pb.Task {
@@ -110,16 +112,12 @@ func (s *Services) AddWatchlistItem(ctx context.Context, req *pb.AddWatchlistIte
 		return nil, status.Errorf(codes.InvalidArgument, "add watchlist item: %v", err)
 	}
 
-	// 若 DuckDB 无日频数据则自动创建获取任务
-	statusRow, _ := s.Store.ListStocks(ctx, data.ListStocksFilter{Search: item.StockCode})
-	needsSync := true
-	for _, st := range statusRow {
-		if st.StockCode == item.StockCode && st.SyncStatus == data.StockStatusReady {
-			needsSync = false
-			break
-		}
+	// 若 DuckDB 无就绪日频数据则自动创建获取任务
+	ready, err := s.Store.StockHasReadyData(ctx, item.StockCode)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "check stock data: %v", err)
 	}
-	if needsSync {
+	if !ready {
 		_, _ = s.Store.CreateStockSyncTask(ctx, item.StockCode, data.TriggerManual)
 	}
 

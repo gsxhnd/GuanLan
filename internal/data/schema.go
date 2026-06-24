@@ -20,6 +20,21 @@ CREATE TABLE IF NOT EXISTS index_constituents (
 	PRIMARY KEY (index_code, stock_code, snap_date)
 );
 
+CREATE TABLE IF NOT EXISTS daily_bars_raw (
+	stock_code   VARCHAR NOT NULL,
+	market       VARCHAR NOT NULL,
+	trade_date   DATE NOT NULL,
+	open         DOUBLE,
+	high         DOUBLE,
+	low          DOUBLE,
+	close        DOUBLE,
+	volume       BIGINT,
+	amount       DOUBLE,
+	source       VARCHAR NOT NULL DEFAULT 'yfinance',
+	ingested_at  TIMESTAMPTZ NOT NULL,
+	PRIMARY KEY (stock_code, trade_date, source)
+);
+
 CREATE TABLE IF NOT EXISTS daily_bars (
 	stock_code   VARCHAR NOT NULL,
 	market       VARCHAR NOT NULL,
@@ -38,6 +53,30 @@ CREATE TABLE IF NOT EXISTS daily_bars (
 
 CREATE INDEX IF NOT EXISTS idx_daily_bars_stock_date
 	ON daily_bars (stock_code, trade_date DESC);
+
+CREATE TABLE IF NOT EXISTS daily_features (
+	stock_code    VARCHAR NOT NULL,
+	trade_date    DATE NOT NULL,
+	return_1d     DOUBLE,
+	volume_ma5    DOUBLE,
+	close_ma5     DOUBLE,
+	data_version  VARCHAR NOT NULL DEFAULT '',
+	PRIMARY KEY (stock_code, trade_date)
+);
+
+CREATE TABLE IF NOT EXISTS data_quality_issues (
+	issue_id      VARCHAR PRIMARY KEY,
+	stock_code    VARCHAR NOT NULL,
+	trade_date    DATE,
+	issue_type    VARCHAR NOT NULL,
+	severity      VARCHAR NOT NULL,
+	message       VARCHAR,
+	data_version  VARCHAR,
+	created_at    TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_data_quality_stock
+	ON data_quality_issues (stock_code, created_at DESC);
 
 CREATE TABLE IF NOT EXISTS stock_data_status (
 	stock_code          VARCHAR PRIMARY KEY,

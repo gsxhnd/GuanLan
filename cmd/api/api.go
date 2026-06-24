@@ -22,12 +22,27 @@ func NewStore(cfg Config) (*data.Store, error) {
 	return data.Open(cfg.DBPath)
 }
 
-func NewServices(store *data.Store) *server.Services {
-	return &server.Services{Store: store}
+func NewServices(store *data.Store, cfg Config) *server.Services {
+	return &server.Services{
+		Store: store,
+		Python: task.PythonSyncConfig{
+			PythonBin: cfg.PythonBin,
+			RepoRoot:  cfg.RepoRoot,
+			DBPath:    cfg.DBPath,
+		},
+	}
 }
 
 func NewScheduler(store *data.Store, cfg Config) *task.Scheduler {
-	return task.NewScheduler(store, &task.DataSyncExecutor{Store: store}, cfg.TaskPollInterval)
+	exec := &task.PythonDataSyncExecutor{
+		Store: store,
+		Config: task.PythonSyncConfig{
+			PythonBin: cfg.PythonBin,
+			RepoRoot:  cfg.RepoRoot,
+			DBPath:    cfg.DBPath,
+		},
+	}
+	return task.NewScheduler(store, exec, cfg.TaskPollInterval)
 }
 
 func NewGRPCServer(svc *server.Services) *grpc.Server {
@@ -57,6 +72,20 @@ func Run(
 	lc.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			log.Printf("api server listening on %s (db: %s)", cfg.GRPCAddr, cfg.DBPath)
+			if cfg.InitTraining {
+				go func() {
+					ctx := context.Background()
+					if err := task.InitTrainingData(ctx, task.PythonSyncConfig{
+						PythonBin: cfg.PythonBin,
+						RepoRoot:  cfg.RepoRoot,
+						DBPath:    cfg.DBPath,
+					}, "000905.SH", "000510.SH"); err != nil {
+						log.Printf("init training: %v", err)
+					} else {
+						log.Printf("training index data initialized")
+					}
+				}()
+			}
 			sched.Start(ctx)
 			schedCtx, schedCancel := context.WithCancel(ctx)
 			state.cancelScheduled = schedCancel
