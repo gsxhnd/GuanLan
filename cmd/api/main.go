@@ -6,6 +6,9 @@ func main() {
 	fx.New(
 		fx.Provide(
 			NewConfig,
+			NewStore,
+			NewServices,
+			NewScheduler,
 			NewListener,
 			NewGRPCServer,
 		),

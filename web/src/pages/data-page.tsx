@@ -8,8 +8,10 @@ import {
   DataTableRow,
   DataTableTd,
   DataTableTh,
+  EmptyState,
   PageHeader,
   StatusBadge,
+  TaskStatusBanner,
 } from "@/components/page"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -108,6 +110,16 @@ export function DataPage() {
             手动同步
           </Button>
         }
+      />
+
+      <TaskStatusBanner
+        title="数据获取 · BABA"
+        status="failed"
+        detail="手动触发 · 任务 ID b8c1…"
+        failureReason="yfinance 请求超时（30s），已重试 2 次"
+        updatedAt="12:18"
+        onViewLog={() => showToast("日志入口 · Phase 2 接入")}
+        onRetry={() => showToast("BABA 已重新触发获取任务")}
       />
 
       <ContentCard bodyClassName="p-0">
@@ -284,6 +296,12 @@ export function DataPage() {
           noPadding
           bodyClassName="max-h-[calc(100vh-120px)] overflow-auto p-0 xl:max-h-none"
         >
+          {filtered.length === 0 ? (
+            <EmptyState
+              title="无匹配股票"
+              description="调整筛选条件或清空搜索词后重试。"
+            />
+          ) : (
           <DataTable>
             <DataTableHead>
               <DataTableTh>代码</DataTableTh>
@@ -337,6 +355,7 @@ export function DataPage() {
               })}
             </DataTableBody>
           </DataTable>
+          )}
         </ContentCard>
       </div>
 

@@ -1,5 +1,8 @@
 export { ChartPlaceholder } from "./chart-placeholder"
 export { ContentCard } from "./content-card"
+export { LogButton } from "./log-button"
+export { RetryButton } from "./retry-button"
+export { TaskStatusBanner } from "./task-status-banner"
 export {
   DataTable,
   DataTableBody,

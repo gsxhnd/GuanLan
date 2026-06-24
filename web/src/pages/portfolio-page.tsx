@@ -1,6 +1,7 @@
 import { useMemo, useState } from "react"
 
 import {
+  ChartPlaceholder,
   ContentCard,
   DataTable,
   DataTableBody,
@@ -8,6 +9,7 @@ import {
   DataTableRow,
   DataTableTd,
   DataTableTh,
+  EmptyState,
   PageHeader,
   PageTabs,
   StatCard,
@@ -62,6 +64,8 @@ const TABS = [
   { id: "trades", label: "交易记录" },
   { id: "dividends", label: "分红记录" },
 ]
+
+const ASSET_CHART_HEIGHTS = [42, 48, 45, 52, 58, 55, 62, 68, 72, 78, 85, 100]
 
 export function PortfolioPage() {
   const { showToast, Toast } = useToast()
@@ -250,10 +254,20 @@ export function PortfolioPage() {
         <StatCard label="已实现盈亏" value={formatMoney(realized)} />
       </StatGrid>
 
+      <ContentCard title="总资产走势">
+        <ChartPlaceholder heights={ASSET_CHART_HEIGHTS} />
+      </ContentCard>
+
       <PageTabs tabs={TABS} activeId={activeTab} onChange={setActiveTab} />
 
       {activeTab === "positions" && (
         <ContentCard title="当前持仓" noPadding bodyClassName="p-0">
+          {Object.keys(positions).length === 0 ? (
+            <EmptyState
+              title="暂无持仓"
+              description="通过「交易入账」记录买入后，持仓将自动计算。"
+            />
+          ) : (
           <DataTable>
             <DataTableHead>
               <DataTableTh>代码</DataTableTh>
@@ -293,11 +307,18 @@ export function PortfolioPage() {
               })}
             </DataTableBody>
           </DataTable>
+          )}
         </ContentCard>
       )}
 
       {activeTab === "trades" && (
         <ContentCard title="交易流水" noPadding bodyClassName="p-0">
+          {trades.length === 0 ? (
+            <EmptyState
+              title="暂无交易记录"
+              description="点击「交易入账」添加买入或卖出流水。"
+            />
+          ) : (
           <DataTable>
             <DataTableHead>
               <DataTableTh>日期</DataTableTh>
@@ -320,11 +341,18 @@ export function PortfolioPage() {
               ))}
             </DataTableBody>
           </DataTable>
+          )}
         </ContentCard>
       )}
 
       {activeTab === "dividends" && (
         <ContentCard title="分红流水" noPadding bodyClassName="p-0">
+          {dividends.length === 0 ? (
+            <EmptyState
+              title="暂无分红记录"
+              description="点击「分红入账」登记现金分红，成本将自动下调。"
+            />
+          ) : (
           <DataTable>
             <DataTableHead>
               <DataTableTh>日期</DataTableTh>
@@ -345,6 +373,7 @@ export function PortfolioPage() {
               ))}
             </DataTableBody>
           </DataTable>
+          )}
         </ContentCard>
       )}
 

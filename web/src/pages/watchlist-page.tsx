@@ -8,8 +8,10 @@ import {
   DataTableRow,
   DataTableTd,
   DataTableTh,
+  EmptyState,
   PageHeader,
   StatusBadge,
+  TaskStatusBanner,
 } from "@/components/page"
 import { Button } from "@/components/ui/button"
 import {
@@ -34,7 +36,6 @@ import {
 } from "@/data/mock"
 import { useToast } from "@/hooks/use-toast"
 import { marketLabel } from "@/lib/format"
-import { cn } from "@/lib/utils"
 
 export function WatchlistPage() {
   const { showToast, Toast } = useToast()
@@ -44,6 +45,8 @@ export function WatchlistPage() {
   const [taskBanner, setTaskBanner] = useState<{
     code: string
     detail: string
+    status: "running" | "failed"
+    failureReason?: string
   } | null>(null)
 
   const [formCode, setFormCode] = useState("")
@@ -106,6 +109,7 @@ export function WatchlistPage() {
       setTaskBanner({
         code,
         detail: "任务状态 running · 预计 2–5 分钟",
+        status: "running",
       })
       showToast(`${code} 已创建数据获取任务`)
 
@@ -150,24 +154,26 @@ export function WatchlistPage() {
       />
 
       {taskBanner && (
-        <div
-          className={cn(
-            "flex flex-wrap items-center gap-3 rounded-lg bg-muted/60 px-4 py-3 text-sm"
-          )}
-        >
-          <div className="size-4 animate-spin rounded-full border-2 border-border border-t-foreground" />
-          <div className="min-w-0 flex-1">
-            <strong>数据获取 · {taskBanner.code}</strong>
-            <div className="text-muted-foreground">{taskBanner.detail}</div>
-          </div>
-          <Button
-            variant="ghost"
-            size="sm"
-            onClick={() => showToast("日志入口 · Phase 2 接入")}
-          >
-            查看日志
-          </Button>
-        </div>
+        <TaskStatusBanner
+          title={`数据获取 · ${taskBanner.code}`}
+          status={taskBanner.status}
+          detail={taskBanner.detail}
+          failureReason={taskBanner.failureReason}
+          onViewLog={() => showToast("日志入口 · Phase 2 接入")}
+          onRetry={
+            taskBanner.status === "failed"
+              ? () => {
+                  setTaskBanner({
+                    ...taskBanner,
+                    status: "running",
+                    detail: "重试中 · 预计 2–5 分钟",
+                    failureReason: undefined,
+                  })
+                  showToast(`${taskBanner.code} 已重新触发获取任务`)
+                }
+              : undefined
+          }
+        />
       )}
 
       <ContentCard
@@ -189,6 +195,12 @@ export function WatchlistPage() {
         noPadding
         bodyClassName="p-0"
       >
+        {filtered.length === 0 ? (
+          <EmptyState
+            title="股票池为空"
+            description="点击「添加股票」手动添加指定代码，纳入日频展示与每日分析。"
+          />
+        ) : (
         <DataTable>
           <DataTableHead>
             <DataTableTh>代码</DataTableTh>
@@ -231,6 +243,7 @@ export function WatchlistPage() {
             ))}
           </DataTableBody>
         </DataTable>
+        )}
       </ContentCard>
 
       <Dialog open={addOpen} onOpenChange={setAddOpen}>

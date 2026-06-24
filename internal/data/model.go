@@ -24,6 +24,9 @@ type TaskType string
 
 const (
 	TaskTypeDataSync TaskType = "data_sync"
+	TaskTypeAnalysis TaskType = "analysis"
+	TaskTypeTraining TaskType = "training"
+	TaskTypeBacktest TaskType = "backtest"
 )
 
 // TriggerMethod 任务触发方式。
@@ -113,7 +116,7 @@ type StockListItem struct {
 	Change float64 `json:"change"`
 }
 
-// DataSyncTask 数据同步任务（§2，task_type=data_sync）。
+// DataSyncTask 统一任务记录（§2）。
 type DataSyncTask struct {
 	TaskID        string        `json:"task_id"`
 	TaskType      TaskType      `json:"task_type"`
@@ -126,6 +129,134 @@ type DataSyncTask struct {
 	RetryCount    int           `json:"retry_count"`
 	FailureReason *string       `json:"failure_reason,omitempty"`
 	LogRef        *string       `json:"log_ref,omitempty"`
+	DataVersion   *string       `json:"data_version,omitempty"`
+}
+
+// WatchlistItem 股票池条目（§4.5）。
+type WatchlistItem struct {
+	StockCode    string     `json:"stock_code"`
+	Market       Market     `json:"market"`
+	Tags         []string   `json:"tags,omitempty"`
+	Priority     int        `json:"priority"`
+	Notes        string     `json:"notes,omitempty"`
+	IsActive     bool       `json:"is_active"`
+	AddedAt      time.Time  `json:"added_at"`
+	RemovedAt    *time.Time `json:"removed_at,omitempty"`
+	Source       string     `json:"source"`
+	LastAction   string     `json:"last_action,omitempty"`
+	LastActionAt *time.Time `json:"last_action_at,omitempty"`
+	SyncStatus   string     `json:"sync_status,omitempty"`
+	Completeness float64    `json:"completeness,omitempty"`
+}
+
+// TradeSide 交易方向。
+type TradeSide string
+
+const (
+	TradeSideBuy  TradeSide = "buy"
+	TradeSideSell TradeSide = "sell"
+)
+
+// PortfolioTrade 交易记录（§4.6）。
+type PortfolioTrade struct {
+	TradeID   string    `json:"trade_id"`
+	TradeDate time.Time `json:"trade_date"`
+	StockCode string    `json:"stock_code"`
+	StockName string    `json:"stock_name"`
+	Side      TradeSide `json:"side"`
+	Price     float64   `json:"price"`
+	Quantity  float64   `json:"quantity"`
+	TotalFee  float64   `json:"total_fee"`
+	Note      string    `json:"note,omitempty"`
+	CreatedAt time.Time `json:"created_at"`
+}
+
+// PortfolioDividend 现金分红（§4.7）。
+type PortfolioDividend struct {
+	DividendID        string    `json:"dividend_id"`
+	DividendDate      time.Time `json:"dividend_date"`
+	StockCode         string    `json:"stock_code"`
+	DividendPerShare  *float64  `json:"dividend_per_share,omitempty"`
+	TotalDividend     float64   `json:"total_dividend"`
+	BonusShareRatio   *float64  `json:"bonus_share_ratio,omitempty"`
+	TransferShareRatio *float64 `json:"transfer_share_ratio,omitempty"`
+	Note              string    `json:"note,omitempty"`
+	CreatedAt         time.Time `json:"created_at"`
+}
+
+// CashFlowType 现金流类型。
+type CashFlowType string
+
+const (
+	CashFlowDeposit    CashFlowType = "deposit"
+	CashFlowWithdrawal CashFlowType = "withdrawal"
+	CashFlowTrade      CashFlowType = "trade"
+	CashFlowDividend   CashFlowType = "dividend"
+)
+
+// PortfolioCashFlow 现金流记录（§4.8）。
+type PortfolioCashFlow struct {
+	CashFlowID string       `json:"cash_flow_id"`
+	FlowDate   time.Time    `json:"flow_date"`
+	Amount     float64      `json:"amount"`
+	FlowType   CashFlowType `json:"flow_type"`
+	SourceRef  *string      `json:"source_ref,omitempty"`
+	Note       string       `json:"note,omitempty"`
+	CreatedAt  time.Time    `json:"created_at"`
+}
+
+// PortfolioPosition 持仓状态（§4.9）。
+type PortfolioPosition struct {
+	StockCode      string   `json:"stock_code"`
+	StockName      string   `json:"stock_name"`
+	Quantity       float64  `json:"quantity"`
+	TotalCost      float64  `json:"total_cost"`
+	AverageCost    float64  `json:"average_cost"`
+	RealizedPnL    float64  `json:"realized_pnl"`
+	DividendIncome float64  `json:"dividend_income"`
+	LatestPrice    *float64 `json:"latest_price,omitempty"`
+	MarketValue    *float64 `json:"market_value,omitempty"`
+	UnrealizedPnL  *float64 `json:"unrealized_pnl,omitempty"`
+}
+
+// PortfolioValuation 估值快照（§4.10）。
+type PortfolioValuation struct {
+	ValuationID        string    `json:"valuation_id"`
+	ValuationDate      time.Time `json:"valuation_date"`
+	StockCode          *string   `json:"stock_code,omitempty"`
+	Price              *float64  `json:"price,omitempty"`
+	TotalAssetOverride *float64  `json:"total_asset_override,omitempty"`
+	Source             string    `json:"source"`
+	Note               string    `json:"note,omitempty"`
+	CreatedAt          time.Time `json:"created_at"`
+}
+
+// AssetSnapshot 资产快照（§4.11）。
+type AssetSnapshot struct {
+	SnapshotDate       time.Time `json:"snapshot_date"`
+	CashBalance        float64   `json:"cash_balance"`
+	HoldingMarketValue float64   `json:"holding_market_value"`
+	TotalAsset         float64   `json:"total_asset"`
+	Source             string    `json:"source"`
+}
+
+// StockContribution 年度股票贡献。
+type StockContribution struct {
+	StockCode      string  `json:"stock_code"`
+	RealizedPnL    float64 `json:"realized_pnl"`
+	DividendIncome float64 `json:"dividend_income"`
+}
+
+// AnnualReview 年度复盘汇总（§4.12）。
+type AnnualReview struct {
+	Year             int                 `json:"year"`
+	RealizedPnL      float64             `json:"realized_pnl"`
+	DividendIncome   float64             `json:"dividend_income"`
+	NetCashFlow      float64             `json:"net_cash_flow"`
+	BeginTotalAsset  *float64            `json:"begin_total_asset,omitempty"`
+	EndTotalAsset    *float64            `json:"end_total_asset,omitempty"`
+	ReturnRate       *float64            `json:"return_rate,omitempty"`
+	ByStockBreakdown []StockContribution `json:"by_stock_breakdown,omitempty"`
 }
 
 // ListStocksFilter 对应 GET /api/data/stocks 查询参数。

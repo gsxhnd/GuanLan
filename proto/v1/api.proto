@@ -1,0 +1,419 @@
+syntax = "proto3";
+
+package guanlan.v1;
+
+option go_package = "github.com/gsxhnd/guanlan/internal/proto/v1;v1";
+
+import "google/api/annotations.proto";
+import "google/protobuf/timestamp.proto";
+
+// --- Common ---
+
+message Empty {}
+
+// --- Tasks ---
+
+message Task {
+  string task_id = 1;
+  string task_type = 2;
+  string target_object = 3;
+  string trigger_method = 4;
+  string status = 5;
+  google.protobuf.Timestamp created_at = 6;
+  google.protobuf.Timestamp started_at = 7;
+  google.protobuf.Timestamp ended_at = 8;
+  int32 retry_count = 9;
+  string failure_reason = 10;
+  string log_ref = 11;
+  string data_version = 12;
+}
+
+message ListTasksRequest {
+  string task_type = 1;
+  int32 limit = 2;
+}
+
+message ListTasksResponse {
+  repeated Task tasks = 1;
+}
+
+message GetTaskRequest {
+  string task_id = 1;
+}
+
+message RetryTaskRequest {
+  string task_id = 1;
+}
+
+message RetryTaskResponse {
+  Task task = 1;
+}
+
+service TaskService {
+  rpc ListTasks(ListTasksRequest) returns (ListTasksResponse) {
+    option (google.api.http) = {get: "/api/tasks"};
+  }
+  rpc GetTask(GetTaskRequest) returns (Task) {
+    option (google.api.http) = {get: "/api/tasks/{task_id}"};
+  }
+  rpc RetryTask(RetryTaskRequest) returns (RetryTaskResponse) {
+    option (google.api.http) = {post: "/api/tasks/{task_id}/retry" body: "*"};
+  }
+}
+
+// --- Watchlist ---
+
+message WatchlistItem {
+  string stock_code = 1;
+  string market = 2;
+  repeated string tags = 3;
+  int32 priority = 4;
+  string notes = 5;
+  bool is_active = 6;
+  google.protobuf.Timestamp added_at = 7;
+  google.protobuf.Timestamp removed_at = 8;
+  string source = 9;
+  string last_action = 10;
+  google.protobuf.Timestamp last_action_at = 11;
+  string sync_status = 12;
+  double completeness = 13;
+}
+
+message ListWatchlistRequest {
+  bool active_only = 1;
+}
+
+message ListWatchlistResponse {
+  repeated WatchlistItem items = 1;
+}
+
+message AddWatchlistItemRequest {
+  string stock_code = 1;
+  string market = 2;
+  repeated string tags = 3;
+  int32 priority = 4;
+  string notes = 5;
+  bool is_active = 6;
+}
+
+message RemoveWatchlistItemRequest {
+  string stock_code = 1;
+  bool hard_delete = 2;
+}
+
+service WatchlistService {
+  rpc ListWatchlist(ListWatchlistRequest) returns (ListWatchlistResponse) {
+    option (google.api.http) = {get: "/api/watchlist"};
+  }
+  rpc AddWatchlistItem(AddWatchlistItemRequest) returns (WatchlistItem) {
+    option (google.api.http) = {post: "/api/watchlist/items" body: "*"};
+  }
+  rpc RemoveWatchlistItem(RemoveWatchlistItemRequest) returns (WatchlistItem) {
+    option (google.api.http) = {delete: "/api/watchlist/items/{stock_code}"};
+  }
+}
+
+// --- Portfolio ---
+
+message Trade {
+  string trade_id = 1;
+  string trade_date = 2;
+  string stock_code = 3;
+  string stock_name = 4;
+  string side = 5;
+  double price = 6;
+  double quantity = 7;
+  double total_fee = 8;
+  string note = 9;
+  google.protobuf.Timestamp created_at = 10;
+}
+
+message CreateTradeRequest {
+  string trade_date = 1;
+  string stock_code = 2;
+  string stock_name = 3;
+  string side = 4;
+  double price = 5;
+  double quantity = 6;
+  double total_fee = 7;
+  string note = 8;
+}
+
+message ListTradesRequest {
+  string year = 1;
+  int32 limit = 2;
+}
+
+message ListTradesResponse {
+  repeated Trade trades = 1;
+}
+
+message Dividend {
+  string dividend_id = 1;
+  string dividend_date = 2;
+  string stock_code = 3;
+  double dividend_per_share = 4;
+  double total_dividend = 5;
+  string note = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+message CreateDividendRequest {
+  string dividend_date = 1;
+  string stock_code = 2;
+  double dividend_per_share = 3;
+  double total_dividend = 4;
+  string note = 5;
+}
+
+message ListDividendsRequest {
+  string year = 1;
+  int32 limit = 2;
+}
+
+message ListDividendsResponse {
+  repeated Dividend dividends = 1;
+}
+
+message CashFlow {
+  string cash_flow_id = 1;
+  string flow_date = 2;
+  double amount = 3;
+  string flow_type = 4;
+  string source_ref = 5;
+  string note = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+message CreateCashFlowRequest {
+  string flow_date = 1;
+  double amount = 2;
+  string flow_type = 3;
+  string note = 4;
+}
+
+message ListCashFlowsRequest {
+  string year = 1;
+  int32 limit = 2;
+}
+
+message ListCashFlowsResponse {
+  repeated CashFlow cash_flows = 1;
+}
+
+message Position {
+  string stock_code = 1;
+  string stock_name = 2;
+  double quantity = 3;
+  double total_cost = 4;
+  double average_cost = 5;
+  double realized_pnl = 6;
+  double dividend_income = 7;
+  double latest_price = 8;
+  double market_value = 9;
+  double unrealized_pnl = 10;
+}
+
+message ListPositionsResponse {
+  repeated Position positions = 1;
+  double cash_balance = 2;
+}
+
+message Valuation {
+  string valuation_id = 1;
+  string valuation_date = 2;
+  string stock_code = 3;
+  double price = 4;
+  double total_asset_override = 5;
+  string source = 6;
+  string note = 7;
+}
+
+message CreateValuationRequest {
+  string valuation_date = 1;
+  string stock_code = 2;
+  double price = 3;
+  double total_asset_override = 4;
+  string source = 5;
+  string note = 6;
+}
+
+message ListValuationsRequest {
+  string year = 1;
+}
+
+message ListValuationsResponse {
+  repeated Valuation valuations = 1;
+}
+
+message AssetSnapshot {
+  string snapshot_date = 1;
+  double cash_balance = 2;
+  double holding_market_value = 3;
+  double total_asset = 4;
+  string source = 5;
+}
+
+message GetAssetsRequest {
+  string start_date = 1;
+  string end_date = 2;
+}
+
+message GetAssetsResponse {
+  double cash_balance = 1;
+  double holding_market_value = 2;
+  double total_asset = 3;
+  repeated AssetSnapshot snapshots = 4;
+}
+
+message StockContribution {
+  string stock_code = 1;
+  double realized_pnl = 2;
+  double dividend_income = 3;
+}
+
+message AnnualReview {
+  int32 year = 1;
+  double realized_pnl = 2;
+  double dividend_income = 3;
+  double net_cash_flow = 4;
+  double begin_total_asset = 5;
+  double end_total_asset = 6;
+  double return_rate = 7;
+  repeated StockContribution by_stock = 8;
+}
+
+message GetAnnualReviewRequest {
+  int32 year = 1;
+}
+
+service PortfolioService {
+  rpc CreateTrade(CreateTradeRequest) returns (Trade) {
+    option (google.api.http) = {post: "/api/portfolio/trades" body: "*"};
+  }
+  rpc ListTrades(ListTradesRequest) returns (ListTradesResponse) {
+    option (google.api.http) = {get: "/api/portfolio/trades"};
+  }
+  rpc CreateDividend(CreateDividendRequest) returns (Dividend) {
+    option (google.api.http) = {post: "/api/portfolio/dividends" body: "*"};
+  }
+  rpc ListDividends(ListDividendsRequest) returns (ListDividendsResponse) {
+    option (google.api.http) = {get: "/api/portfolio/dividends"};
+  }
+  rpc CreateCashFlow(CreateCashFlowRequest) returns (CashFlow) {
+    option (google.api.http) = {post: "/api/portfolio/cash-flows" body: "*"};
+  }
+  rpc ListCashFlows(ListCashFlowsRequest) returns (ListCashFlowsResponse) {
+    option (google.api.http) = {get: "/api/portfolio/cash-flows"};
+  }
+  rpc ListPositions(Empty) returns (ListPositionsResponse) {
+    option (google.api.http) = {get: "/api/portfolio/positions"};
+  }
+  rpc CreateValuation(CreateValuationRequest) returns (Valuation) {
+    option (google.api.http) = {post: "/api/portfolio/valuations" body: "*"};
+  }
+  rpc ListValuations(ListValuationsRequest) returns (ListValuationsResponse) {
+    option (google.api.http) = {get: "/api/portfolio/valuations"};
+  }
+  rpc GetAssets(GetAssetsRequest) returns (GetAssetsResponse) {
+    option (google.api.http) = {get: "/api/portfolio/assets"};
+  }
+  rpc GetAnnualReview(GetAnnualReviewRequest) returns (AnnualReview) {
+    option (google.api.http) = {get: "/api/portfolio/annual-reviews"};
+  }
+}
+
+// --- Data ---
+
+message IndexDataset {
+  string index_code = 1;
+  string market = 2;
+  string index_name = 3;
+  double data_completeness = 4;
+  google.protobuf.Timestamp last_sync_time = 5;
+  string sync_status = 6;
+}
+
+message ListIndexesResponse {
+  repeated IndexDataset indexes = 1;
+}
+
+message StockListItem {
+  string stock_code = 1;
+  string stock_name = 2;
+  string market = 3;
+  string sync_status = 4;
+  double completeness = 5;
+  double open = 6;
+  double high = 7;
+  double low = 8;
+  double close = 9;
+  int64 volume = 10;
+  double change = 11;
+  google.protobuf.Timestamp last_update = 12;
+}
+
+message ListStocksRequest {
+  string market = 1;
+  string status = 2;
+  string search = 3;
+  string sort = 4;
+}
+
+message ListStocksResponse {
+  repeated StockListItem stocks = 1;
+}
+
+message DailyBar {
+  string stock_code = 1;
+  string market = 2;
+  string trade_date = 3;
+  double open = 4;
+  double high = 5;
+  double low = 6;
+  double close = 7;
+  int64 volume = 8;
+  string source = 9;
+  string data_version = 10;
+}
+
+message ListDailyBarsRequest {
+  string stock_code = 1;
+  string start_date = 2;
+  string end_date = 3;
+  int32 limit = 4;
+}
+
+message ListDailyBarsResponse {
+  repeated DailyBar bars = 1;
+}
+
+message SyncStockRequest {
+  string stock_code = 1;
+}
+
+message ListDataTasksRequest {
+  int32 limit = 1;
+}
+
+message ListDataTasksResponse {
+  repeated Task tasks = 1;
+}
+
+service DataService {
+  rpc ListIndexes(Empty) returns (ListIndexesResponse) {
+    option (google.api.http) = {get: "/api/data/indexes"};
+  }
+  rpc ListStocks(ListStocksRequest) returns (ListStocksResponse) {
+    option (google.api.http) = {get: "/api/data/stocks"};
+  }
+  rpc ListDailyBars(ListDailyBarsRequest) returns (ListDailyBarsResponse) {
+    option (google.api.http) = {get: "/api/data/stocks/{stock_code}/daily-bars"};
+  }
+  rpc SyncStock(SyncStockRequest) returns (Task) {
+    option (google.api.http) = {post: "/api/data/stocks/{stock_code}/sync" body: "*"};
+  }
+  rpc ListDataTasks(ListDataTasksRequest) returns (ListDataTasksResponse) {
+    option (google.api.http) = {get: "/api/data/tasks"};
+  }
+}

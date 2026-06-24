@@ -2,6 +2,7 @@ import { useTranslation } from "react-i18next"
 
 import {
   ContentCard,
+  LogButton,
   PageHeader,
   StatCard,
   StatGrid,
@@ -9,12 +10,15 @@ import {
 } from "@/components/page"
 import { PreferencesPanel } from "@/components/settings/preferences-panel"
 import { Button } from "@/components/ui/button"
+import { useToast } from "@/hooks/use-toast"
 
 export function SystemPage() {
   const { t } = useTranslation()
+  const { showToast, Toast } = useToast()
 
   return (
     <div className="flex flex-col gap-6">
+      {Toast}
       <PageHeader
         title={t("pages.system.title")}
         description={t("pages.system.description")}
@@ -80,7 +84,10 @@ export function SystemPage() {
 
       <ContentCard title={t("settings.shortcutsTitle")}>
         <div className="flex flex-col gap-3 sm:flex-row sm:flex-wrap">
-          <Button variant="secondary">{t("settings.shortcuts.logs")}</Button>
+          <LogButton
+            size="default"
+            onClick={() => showToast("日志入口 · Phase 2 接入")}
+          />
           <Button variant="secondary">
             {t("settings.shortcuts.dataVersions")}
           </Button>
