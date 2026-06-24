@@ -115,6 +115,74 @@
         ]
       }
     },
+    "/api/data/pool": {
+      "get": {
+        "operationId": "DataService_ListStockPool",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1ListStockPoolResponse"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "source",
+            "in": "query",
+            "required": false,
+            "type": "string"
+          },
+          {
+            "name": "dailySyncOnly",
+            "in": "query",
+            "required": false,
+            "type": "boolean"
+          }
+        ],
+        "tags": [
+          "DataService"
+        ]
+      }
+    },
+    "/api/data/pool/items": {
+      "post": {
+        "operationId": "DataService_UpsertStockPoolItem",
+        "responses": {
+          "200": {
+            "description": "A successful response.",
+            "schema": {
+              "$ref": "#/definitions/v1StockPoolItem"
+            }
+          },
+          "default": {
+            "description": "An unexpected error response.",
+            "schema": {
+              "$ref": "#/definitions/rpcStatus"
+            }
+          }
+        },
+        "parameters": [
+          {
+            "name": "body",
+            "in": "body",
+            "required": true,
+            "schema": {
+              "$ref": "#/definitions/v1UpsertStockPoolItemRequest"
+            }
+          }
+        ],
+        "tags": [
+          "DataService"
+        ]
+      }
+    },
     "/api/data/stocks": {
       "get": {
         "operationId": "DataService_ListStocks",
@@ -1318,6 +1386,22 @@
         }
       }
     },
+    "v1ListStockPoolResponse": {
+      "type": "object",
+      "properties": {
+        "items": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "$ref": "#/definitions/v1StockPoolItem"
+          }
+        },
+        "total": {
+          "type": "integer",
+          "format": "int32"
+        }
+      }
+    },
     "v1ListStocksResponse": {
       "type": "object",
       "properties": {
@@ -1494,6 +1578,46 @@
         }
       }
     },
+    "v1StockPoolItem": {
+      "type": "object",
+      "properties": {
+        "yfinanceSymbol": {
+          "type": "string"
+        },
+        "originalCode": {
+          "type": "string"
+        },
+        "market": {
+          "type": "string"
+        },
+        "stockName": {
+          "type": "string"
+        },
+        "exchange": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "source": {
+          "type": "string"
+        },
+        "isActive": {
+          "type": "boolean"
+        },
+        "syncDaily": {
+          "type": "boolean"
+        },
+        "createdAt": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "updatedAt": {
+          "type": "string",
+          "format": "date-time"
+        }
+      }
+    },
     "v1Task": {
       "type": "object",
       "properties": {
@@ -1575,6 +1699,35 @@
         "createdAt": {
           "type": "string",
           "format": "date-time"
+        }
+      }
+    },
+    "v1UpsertStockPoolItemRequest": {
+      "type": "object",
+      "properties": {
+        "yfinanceSymbol": {
+          "type": "string"
+        },
+        "originalCode": {
+          "type": "string"
+        },
+        "stockName": {
+          "type": "string"
+        },
+        "market": {
+          "type": "string"
+        },
+        "exchange": {
+          "type": "string"
+        },
+        "currency": {
+          "type": "string"
+        },
+        "syncDaily": {
+          "type": "boolean"
+        },
+        "isActive": {
+          "type": "boolean"
         }
       }
     },

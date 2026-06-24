@@ -317,7 +317,7 @@ export function DataPage() {
           </ContentCard>
         ) : (
           <ContentCard>
-            <EmptyState title={loading ? "加载中…" : "暂无股票数据"} description="运行 init-training 或添加股票池后同步" />
+            <EmptyState title={loading ? "加载中…" : "暂无股票数据"} description="运行 import_stock_pool_csv.py 导入股票池后执行 daily-sync" />
           </ContentCard>
         )}
 
@@ -388,7 +388,7 @@ export function DataPage() {
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
         <ContentCard title="预置训练指数" noPadding bodyClassName="p-0">
           {indexes.length === 0 ? (
-            <EmptyState title="暂无指数" description="go run ./cmd/api -init-training" />
+            <EmptyState title="暂无指数" description="指数数据需单独初始化" />
           ) : (
             <DataTable>
               <DataTableHead>

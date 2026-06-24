@@ -72,19 +72,10 @@ func Run(
 	lc.Append(fx.Hook{
 		OnStart: func(context.Context) error {
 			log.Printf("api server listening on %s (db: %s)", cfg.GRPCAddr, cfg.DBPath)
-			if cfg.InitTraining {
-				go func() {
-					ctx := context.Background()
-					if err := task.InitTrainingData(ctx, task.PythonSyncConfig{
-						PythonBin: cfg.PythonBin,
-						RepoRoot:  cfg.RepoRoot,
-						DBPath:    cfg.DBPath,
-					}, "000905.SH", "000510.SH"); err != nil {
-						log.Printf("init training: %v", err)
-					} else {
-						log.Printf("training index data initialized")
-					}
-				}()
+			pyCfg := task.PythonSyncConfig{
+				PythonBin: cfg.PythonBin,
+				RepoRoot:  cfg.RepoRoot,
+				DBPath:    cfg.DBPath,
 			}
 			sched.Start(ctx)
 			schedCtx, schedCancel := context.WithCancel(ctx)
@@ -97,8 +88,8 @@ func Run(
 					case <-schedCtx.Done():
 						return
 					case <-ticker.C:
-						if err := task.ScheduledSync(schedCtx, store); err != nil {
-							log.Printf("scheduled sync: %v", err)
+						if err := task.ScheduledSync(schedCtx, store, pyCfg, cfg.SyncLookbackDays); err != nil {
+							log.Printf("scheduled daily-sync: %v", err)
 						}
 					}
 				}

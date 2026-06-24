@@ -132,7 +132,30 @@ type DataSyncTask struct {
 	DataVersion   *string       `json:"data_version,omitempty"`
 }
 
-// WatchlistItem 股票池条目（§4.5）。
+// StockPoolSource 股票池条目来源。
+type StockPoolSource string
+
+const (
+	PoolSourceCSVImport StockPoolSource = "csv_import"
+	PoolSourceAPIManual StockPoolSource = "api_manual"
+)
+
+// StockPoolEntry DuckDB 数据底座股票池（日频拉取范围）。
+type StockPoolEntry struct {
+	YfinanceSymbol string          `json:"yfinance_symbol"`
+	OriginalCode   string          `json:"original_code"`
+	Market         Market          `json:"market"`
+	StockName      string          `json:"stock_name"`
+	Exchange       string          `json:"exchange,omitempty"`
+	Currency       string          `json:"currency"`
+	Source         StockPoolSource `json:"source"`
+	IsActive       bool            `json:"is_active"`
+	SyncDaily      bool            `json:"sync_daily"`
+	CreatedAt      time.Time       `json:"created_at"`
+	UpdatedAt      time.Time       `json:"updated_at"`
+}
+
+// WatchlistItem 用户关注股票池条目（§4.5）。
 type WatchlistItem struct {
 	StockCode    string     `json:"stock_code"`
 	Market       Market     `json:"market"`

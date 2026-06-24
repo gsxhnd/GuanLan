@@ -54,11 +54,12 @@ graph TD
 |------|------|
 | gRPC Gateway | 对外暴露 HTTP/JSON API，处理协议转换和基础错误映射 |
 | Go 接口服务 | 承接 gRPC 接口、输入校验、任务创建、状态聚合和前端查询 |
-| 数据获取 | 以活跃股票池为主要范围接入数据源，执行日频初始化、增量更新、质量验证和异常重试 |
-| 数据底座 | 管理 DuckDB 表、数据版本、训练快照和特征数据 |
+| 数据获取 | 以 `stock_pool` 数据底座股票池为范围接入数据源，执行日频初始化、增量更新、质量验证和异常重试 |
+| 数据底座 | 管理 DuckDB 表（含 `stock_pool`）、数据版本、训练快照和特征数据 |
 | 任务调度 | 统一创建、触发、重试和记录数据/分析/训练/回测任务 |
 | 数据图表 | 读取日频行情和质量状态，展示个股价格、成交量和可用区间 |
-| 股票池 | 管理关注股票，支持按股票代码添加、删除、停用和查看数据获取状态 |
+| 股票池（数据底座） | DuckDB `stock_pool`：`yfinance_symbol`（主键）、`original_code`、市场、`source`（`csv_import` / `api_manual`） |
+| 关注列表 | DuckDB `watchlist_items`：用户关注；添加时自动写入 `stock_pool`（`source=api_manual`） |
 | 投资组合记账 | 管理交易、分红、现金流、持仓重算、资产快照和年度汇总 |
 | 特征工程 | 构建技术指标、因子、标准化结果和特征版本 |
 | 模型训练 | 批量训练、验证、超参优化和模型导出 |
@@ -70,10 +71,20 @@ graph TD
 
 | 流程 | 路径 |
 |------|------|
-| 预置训练数据入库 | 训练数据指数成分股快照 → 数据源 → 日频获取 → 清洗校验 → 原始表 → 标准化表 → 数据版本 |
-| 股票池日频入库 | 用户添加股票代码 → 检查 DuckDB 既有数据 → 缺失时创建数据获取任务 → Python 日频数据服务 → 清洗校验 → 原始表 → 标准化表 → 数据版本 |
+| 股票池入库 | `scripts/import_stock_pool_csv.py` 导入 CSV → `stock_pool`；或 API `POST /api/data/pool/items` 手动添加 |
+| 股票池日频入库 | 定时 `daily-sync` → Python `services.daily_data` 读取 `stock_pool` → 清洗校验 → 入库 |
+| 用户关注入库 | 用户添加股票代码 → 写入 `watchlist_items` 并 `EnsureStockInPool` → 缺失时创建 `data_sync` 任务 → Python 日频数据服务 |
 | 日频图表 | 页面请求 → 股票代码/日期范围 → 读取标准化日频表 → 返回价格、成交量和质量状态 |
-| 股票池管理 | 页面操作 → gRPC Gateway → Go 接口服务 → 股票代码校验 → 写入股票池条目 → 更新启用状态和操作结果 |
+| 股票池管理 | 页面操作 → gRPC Gateway → Go 接口服务 → 股票代码校验 → 写入 `watchlist_items` → 同步 `stock_pool` |
+
+## 4.1 Python 服务边界
+
+| 服务 | 模块 | 职责 |
+|------|------|------|
+| 日频数据 | `services.daily_data` | `daily-sync`、`run-scheduler`；从 `stock_pool` 拉 yfinance 行情 |
+| 模型训练 | `services.training` | 读取 DuckDB 特征与标签，训练并导出模型（当前为占位） |
+
+Go API 通过 `uv run python -m services.daily_data` 调用日频服务；训练服务独立运行，不与行情拉取混用。
 | 交易入账 | 交易记录 → 持仓重算 → 现金余额更新 → 已实现盈亏更新 |
 | 分红入账 | 分红记录 → 现金余额增加 → 持仓总成本下调 → 平均成本更新 |
 | 资产估值 | 估值快照/收盘价导入 → 持仓市值计算 → 资产快照 → 总资产图表 |
@@ -95,7 +106,9 @@ graph TD
 | `/api/data/stocks/{stock_code}/daily-bars` | 个股日频行情，用于图表展示 |
 | `/api/data/stocks/{stock_code}/sync` | 为指定股票创建或重试日频数据获取任务 |
 | `/api/data/tasks` | 数据任务记录 |
-| `/api/watchlist` | 股票池列表 |
+| `/api/data/pool` | 数据底座股票池列表（可按 `source` 筛选） |
+| `/api/data/pool/items` | 手动添加股票池条目（`source=api_manual`） |
+| `/api/watchlist` | 用户关注列表 |
 | `/api/watchlist/items` | 添加指定股票代码到股票池 |
 | `/api/watchlist/items/{stock_code}` | 删除或停用股票池中的指定股票代码 |
 | `/api/portfolio/trades` | 交易记录 |

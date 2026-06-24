@@ -421,6 +421,41 @@ message ListDataTasksResponse {
   repeated Task tasks = 1;
 }
 
+message StockPoolItem {
+  string yfinance_symbol = 1;
+  string original_code = 2;
+  string market = 3;
+  string stock_name = 4;
+  string exchange = 5;
+  string currency = 6;
+  string source = 7;
+  bool is_active = 8;
+  bool sync_daily = 9;
+  google.protobuf.Timestamp created_at = 10;
+  google.protobuf.Timestamp updated_at = 11;
+}
+
+message ListStockPoolRequest {
+  string source = 1;
+  bool daily_sync_only = 2;
+}
+
+message ListStockPoolResponse {
+  repeated StockPoolItem items = 1;
+  int32 total = 2;
+}
+
+message UpsertStockPoolItemRequest {
+  string yfinance_symbol = 1;
+  string original_code = 2;
+  string stock_name = 3;
+  string market = 4;
+  string exchange = 5;
+  string currency = 6;
+  bool sync_daily = 7;
+  bool is_active = 8;
+}
+
 service DataService {
   rpc ListIndexes(Empty) returns (ListIndexesResponse) {
     option (google.api.http) = {get: "/api/data/indexes"};
@@ -442,5 +477,11 @@ service DataService {
   }
   rpc ListDataTasks(ListDataTasksRequest) returns (ListDataTasksResponse) {
     option (google.api.http) = {get: "/api/data/tasks"};
+  }
+  rpc ListStockPool(ListStockPoolRequest) returns (ListStockPoolResponse) {
+    option (google.api.http) = {get: "/api/data/pool"};
+  }
+  rpc UpsertStockPoolItem(UpsertStockPoolItemRequest) returns (StockPoolItem) {
+    option (google.api.http) = {post: "/api/data/pool/items" body: "*"};
   }
 }

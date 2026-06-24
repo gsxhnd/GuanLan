@@ -1,7 +1,3 @@
-package data
-
-// schemaDDL 创建数据页相关底层表。命名与 docs/dev/03-domain-model.md 字段对齐。
-const schemaDDL = `
 CREATE TABLE IF NOT EXISTS index_datasets (
 	index_code        VARCHAR PRIMARY KEY,
 	market            VARCHAR NOT NULL,
@@ -97,7 +93,6 @@ CREATE INDEX IF NOT EXISTS idx_stock_data_status_market
 CREATE INDEX IF NOT EXISTS idx_stock_data_status_sync_status
 	ON stock_data_status (sync_status);
 
--- 数据底座股票池：日频拉取范围（与用户关注 watchlist 分离）
 CREATE TABLE IF NOT EXISTS stock_pool (
 	yfinance_symbol  VARCHAR PRIMARY KEY,
 	original_code    VARCHAR NOT NULL,
@@ -230,4 +225,3 @@ CREATE TABLE IF NOT EXISTS portfolio_asset_snapshots (
 	total_asset            DOUBLE NOT NULL,
 	source                 VARCHAR NOT NULL
 );
-`

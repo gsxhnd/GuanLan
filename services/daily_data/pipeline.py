@@ -3,33 +3,54 @@
 from __future__ import annotations
 
 import json
-from datetime import date, datetime, timezone
+from datetime import date
 from pathlib import Path
 
-from services.daily_data import clean, db, validate
+from services.daily_data import clean, db, pool, validate
 from services.daily_data.sources import yfinance
 
 
-def sync_stock(conn, stock_code: str, stock_name: str | None = None, training_index: str | None = None) -> str:
-    code = stock_code.strip().upper()
-    market = yfinance.infer_market(code)
-    version = db.new_data_version(f"sync {code}")
-    db.register_version(conn, version, f"daily sync for {code}")
+def sync_stock(
+    conn,
+    yfinance_symbol: str,
+    stock_name: str | None = None,
+    training_index: str | None = None,
+    *,
+    lookback_days: int | None = None,
+    full_history: bool = False,
+) -> str:
+    symbol = yfinance_symbol.strip()
+    pool_row = pool.get_stock_pool_row(conn, symbol)
+    if pool_row:
+        stock_name = stock_name or pool_row.get("stock_name")
+        market = pool_row["market"]
+    else:
+        pool.ensure_stock_in_pool(conn, symbol, stock_name=stock_name)
+        pool_row = pool.get_stock_pool_row(conn, symbol) or {}
+        market = pool_row.get("market") or yfinance.infer_market(symbol)
 
-    raw = yfinance.fetch_daily_bars(code)
+    version = db.new_data_version(f"sync {symbol}")
+    db.register_version(conn, version, f"daily sync for {symbol}")
+
+    if full_history:
+        raw = yfinance.fetch_daily_bars(symbol, yfinance_symbol=symbol, period="2y")
+    else:
+        days = lookback_days if lookback_days is not None else 7
+        raw = yfinance.fetch_daily_bars(
+            symbol, yfinance_symbol=symbol, lookback_days=days
+        )
+
     db.write_raw_bars(conn, raw)
-
     cleaned = clean.clean_bars(raw)
-    issues = validate.validate_bars(cleaned, code)
+    issues = validate.validate_bars(cleaned, symbol)
     db.write_quality_issues(conn, validate.issue_rows(issues, version))
-
     db.write_standardized_bars(conn, cleaned, version)
     db.write_features(conn, cleaned, version)
 
     completeness = validate.completeness_ratio(cleaned)
-    name = stock_name or code
+    name = stock_name or symbol
     try:
-        info = yfinance.fetch_ticker_info(code)
+        info = yfinance.fetch_ticker_info(symbol, yfinance_symbol=symbol)
         name = info.get("shortName") or info.get("longName") or name
     except Exception:
         pass
@@ -38,7 +59,7 @@ def sync_stock(conn, stock_code: str, stock_name: str | None = None, training_in
     end = cleaned["trade_date"].max() if not cleaned.empty else None
     db.upsert_stock_status(
         conn,
-        stock_code=code,
+        stock_code=symbol,
         stock_name=name,
         market=market,
         completeness=completeness,
@@ -48,6 +69,22 @@ def sync_stock(conn, stock_code: str, stock_name: str | None = None, training_in
         data_end=end,
     )
     return version
+
+
+def daily_sync(conn, lookback_days: int = 7) -> list[str]:
+    """对 stock_pool 中启用每日同步的股票做增量拉取（近 N 个交易日窗口）。"""
+    stocks = pool.list_daily_sync_stocks(conn)
+    versions: list[str] = []
+    for row in stocks:
+        v = sync_stock(
+            conn,
+            row["yfinance_symbol"],
+            row.get("stock_name"),
+            lookback_days=lookback_days,
+            full_history=False,
+        )
+        versions.append(f"{row['yfinance_symbol']}\t{v}")
+    return versions
 
 
 def init_training_index(conn, index_code: str, indices_path: Path) -> str:
@@ -64,10 +101,12 @@ def init_training_index(conn, index_code: str, indices_path: Path) -> str:
     total_completeness = 0.0
     for item in constituents:
         code = item["stock_code"]
-        db.upsert_index_constituent(conn, index_code, code, snap, item.get("weight"))
-        v = sync_stock(conn, code, item.get("name"), training_index=index_code)
+        yf = yfinance.to_yahoo_symbol(code)
+        pool.ensure_stock_in_pool(conn, yf, meta.get("market", "A"), item.get("name"))
+        db.upsert_index_constituent(conn, index_code, yf, snap, item.get("weight"))
+        sync_stock(conn, yf, item.get("name"), training_index=index_code, full_history=True)
         row = conn.execute(
-            "SELECT completeness FROM stock_data_status WHERE stock_code = ?", [code]
+            "SELECT completeness FROM stock_data_status WHERE stock_code = ?", [yf]
         ).fetchone()
         total_completeness += float(row[0]) if row else 0.0
 

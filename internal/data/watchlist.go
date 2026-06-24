@@ -148,6 +148,8 @@ func (s *Store) AddWatchlistItem(ctx context.Context, item WatchlistItem) (Watch
 		return WatchlistItem{}, fmt.Errorf("add watchlist item: %w", err)
 	}
 
+	_ = s.EnsureStockInPool(ctx, code, item.Market, code)
+
 	// 确保 stock_data_status 行存在
 	_ = s.UpsertStockDataStatus(ctx, StockDataStatus{
 		StockCode: code,

@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"strings"
 
 	"github.com/gsxhnd/guanlan/internal/data"
 	"github.com/gsxhnd/guanlan/internal/task"
@@ -171,4 +172,82 @@ func (s *Services) ListDataTasks(ctx context.Context, req *pb.ListDataTasksReque
 		out = append(out, s.toTask(t))
 	}
 	return &pb.ListDataTasksResponse{Tasks: out}, nil
+}
+
+func (s *Services) ListStockPool(ctx context.Context, req *pb.ListStockPoolRequest) (*pb.ListStockPoolResponse, error) {
+	items, err := s.Store.ListStockPool(ctx, data.StockPoolListOptions{
+		Source:        req.GetSource(),
+		DailySyncOnly: req.GetDailySyncOnly(),
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "list stock pool: %v", err)
+	}
+	out := make([]*pb.StockPoolItem, 0, len(items))
+	for _, item := range items {
+		out = append(out, toStockPoolItem(item))
+	}
+	return &pb.ListStockPoolResponse{Items: out, Total: int32(len(out))}, nil
+}
+
+func (s *Services) UpsertStockPoolItem(ctx context.Context, req *pb.UpsertStockPoolItemRequest) (*pb.StockPoolItem, error) {
+	var entry data.StockPoolEntry
+	var err error
+	market := data.Market(strings.TrimSpace(req.GetMarket()))
+	if yf := strings.TrimSpace(req.GetYfinanceSymbol()); yf != "" {
+		entry, err = data.ParsePoolSymbol(yf, market)
+	} else if original := strings.TrimSpace(req.GetOriginalCode()); original != "" {
+		symbol := original
+		if exchange := strings.TrimSpace(req.GetExchange()); exchange != "" {
+			symbol = original + "." + exchange
+		}
+		entry, err = data.ParsePoolSymbol(symbol, market)
+	} else {
+		return nil, status.Errorf(codes.InvalidArgument, "yfinance_symbol or original_code is required")
+	}
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, "%v", err)
+	}
+	if original := strings.TrimSpace(req.GetOriginalCode()); original != "" {
+		entry.OriginalCode = original
+	}
+	if name := strings.TrimSpace(req.GetStockName()); name != "" {
+		entry.StockName = name
+	}
+	if currency := strings.TrimSpace(req.GetCurrency()); currency != "" {
+		entry.Currency = currency
+	}
+	if exchange := strings.TrimSpace(req.GetExchange()); exchange != "" {
+		entry.Exchange = exchange
+	}
+	entry.Source = data.PoolSourceAPIManual
+	entry.IsActive = true
+	entry.SyncDaily = true
+
+	if err := s.Store.UpsertStockPoolEntry(ctx, entry); err != nil {
+		return nil, status.Errorf(codes.Internal, "upsert stock pool item: %v", err)
+	}
+	saved, ok, err := s.Store.GetStockPoolEntry(ctx, entry.YfinanceSymbol)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, "get stock pool item: %v", err)
+	}
+	if !ok {
+		return nil, status.Errorf(codes.Internal, "stock pool item not found after upsert")
+	}
+	return toStockPoolItem(saved), nil
+}
+
+func toStockPoolItem(item data.StockPoolEntry) *pb.StockPoolItem {
+	return &pb.StockPoolItem{
+		YfinanceSymbol: item.YfinanceSymbol,
+		OriginalCode:   item.OriginalCode,
+		Market:         string(item.Market),
+		StockName:      item.StockName,
+		Exchange:       item.Exchange,
+		Currency:       item.Currency,
+		Source:         string(item.Source),
+		IsActive:       item.IsActive,
+		SyncDaily:      item.SyncDaily,
+		CreatedAt:      tsPtr(&item.CreatedAt),
+		UpdatedAt:      tsPtr(&item.UpdatedAt),
+	}
 }

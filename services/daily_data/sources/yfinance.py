@@ -2,7 +2,7 @@
 
 from __future__ import annotations
 
-from datetime import datetime, timedelta, timezone
+from datetime import date, datetime, timedelta, timezone
 from typing import Any
 
 import pandas as pd
@@ -28,10 +28,23 @@ def infer_market(stock_code: str) -> str:
     return "US"
 
 
-def fetch_daily_bars(stock_code: str, period: str = "2y") -> pd.DataFrame:
-    symbol = to_yahoo_symbol(stock_code)
+def fetch_daily_bars(
+    stock_code: str,
+    *,
+    yfinance_symbol: str | None = None,
+    period: str | None = None,
+    lookback_days: int | None = None,
+) -> pd.DataFrame:
+    symbol = yfinance_symbol or to_yahoo_symbol(stock_code)
     ticker = yf.Ticker(symbol)
-    hist = ticker.history(period=period, auto_adjust=False)
+
+    if lookback_days is not None and lookback_days > 0:
+        start = date.today() - timedelta(days=lookback_days + 5)
+        end = date.today() + timedelta(days=1)
+        hist = ticker.history(start=start.isoformat(), end=end.isoformat(), auto_adjust=False)
+    else:
+        hist = ticker.history(period=period or "2y", auto_adjust=False)
+
     if hist.empty:
         raise RuntimeError(f"yfinance returned no data for {stock_code} ({symbol})")
 
@@ -57,10 +70,7 @@ def fetch_daily_bars(stock_code: str, period: str = "2y") -> pd.DataFrame:
         "Volume": "volume",
     }
     for src, dst in cols.items():
-        if src in frame.columns:
-            frame[dst] = frame[src]
-        else:
-            frame[dst] = None
+        frame[dst] = frame[src] if src in frame.columns else None
 
     if "amount" not in frame.columns:
         frame["amount"] = None
@@ -82,7 +92,7 @@ def fetch_daily_bars(stock_code: str, period: str = "2y") -> pd.DataFrame:
     ]
 
 
-def fetch_ticker_info(stock_code: str) -> dict[str, Any]:
-    symbol = to_yahoo_symbol(stock_code)
+def fetch_ticker_info(stock_code: str, yfinance_symbol: str | None = None) -> dict[str, Any]:
+    symbol = yfinance_symbol or to_yahoo_symbol(stock_code)
     info = yf.Ticker(symbol).get_info()
     return info if isinstance(info, dict) else {}

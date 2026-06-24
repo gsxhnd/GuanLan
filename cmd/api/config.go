@@ -12,7 +12,7 @@ type Config struct {
 	DBPath                string
 	RepoRoot              string
 	PythonBin             string
-	InitTraining          bool
+	SyncLookbackDays      int
 	TaskPollInterval      time.Duration
 	ScheduledSyncInterval time.Duration
 }
@@ -22,9 +22,9 @@ func NewConfig() Config {
 	dbPath := flag.String("db", data.DefaultDBPath, "DuckDB file path")
 	repoRoot := flag.String("repo-root", ".", "repository root for Python services")
 	pythonBin := flag.String("python", "uv", "Python runner (uv or python3)")
-	initTraining := flag.Bool("init-training", false, "initialize training index data on startup")
+	lookback := flag.Int("sync-lookback-days", 7, "daily sync lookback window in days")
 	taskPoll := flag.Duration("task-poll", 2*time.Second, "task scheduler poll interval")
-	scheduledSync := flag.Duration("scheduled-sync", time.Hour, "scheduled data sync interval")
+	scheduledSync := flag.Duration("scheduled-sync", 24*time.Hour, "daily incremental sync interval")
 	flag.Parse()
 
 	return Config{
@@ -32,7 +32,7 @@ func NewConfig() Config {
 		DBPath:                *dbPath,
 		RepoRoot:              *repoRoot,
 		PythonBin:             *pythonBin,
-		InitTraining:          *initTraining,
+		SyncLookbackDays:      *lookback,
 		TaskPollInterval:      *taskPoll,
 		ScheduledSyncInterval: *scheduledSync,
 	}

@@ -858,6 +858,8 @@ const (
 	DataService_ListDailyBars_FullMethodName         = "/guanlan.v1.DataService/ListDailyBars"
 	DataService_SyncStock_FullMethodName             = "/guanlan.v1.DataService/SyncStock"
 	DataService_ListDataTasks_FullMethodName         = "/guanlan.v1.DataService/ListDataTasks"
+	DataService_ListStockPool_FullMethodName         = "/guanlan.v1.DataService/ListStockPool"
+	DataService_UpsertStockPoolItem_FullMethodName   = "/guanlan.v1.DataService/UpsertStockPoolItem"
 )
 
 // DataServiceClient is the client API for DataService service.
@@ -871,6 +873,8 @@ type DataServiceClient interface {
 	ListDailyBars(ctx context.Context, in *ListDailyBarsRequest, opts ...grpc.CallOption) (*ListDailyBarsResponse, error)
 	SyncStock(ctx context.Context, in *SyncStockRequest, opts ...grpc.CallOption) (*Task, error)
 	ListDataTasks(ctx context.Context, in *ListDataTasksRequest, opts ...grpc.CallOption) (*ListDataTasksResponse, error)
+	ListStockPool(ctx context.Context, in *ListStockPoolRequest, opts ...grpc.CallOption) (*ListStockPoolResponse, error)
+	UpsertStockPoolItem(ctx context.Context, in *UpsertStockPoolItemRequest, opts ...grpc.CallOption) (*StockPoolItem, error)
 }
 
 type dataServiceClient struct {
@@ -951,6 +955,26 @@ func (c *dataServiceClient) ListDataTasks(ctx context.Context, in *ListDataTasks
 	return out, nil
 }
 
+func (c *dataServiceClient) ListStockPool(ctx context.Context, in *ListStockPoolRequest, opts ...grpc.CallOption) (*ListStockPoolResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(ListStockPoolResponse)
+	err := c.cc.Invoke(ctx, DataService_ListStockPool_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *dataServiceClient) UpsertStockPoolItem(ctx context.Context, in *UpsertStockPoolItemRequest, opts ...grpc.CallOption) (*StockPoolItem, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(StockPoolItem)
+	err := c.cc.Invoke(ctx, DataService_UpsertStockPoolItem_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // DataServiceServer is the server API for DataService service.
 // All implementations should embed UnimplementedDataServiceServer
 // for forward compatibility.
@@ -962,6 +986,8 @@ type DataServiceServer interface {
 	ListDailyBars(context.Context, *ListDailyBarsRequest) (*ListDailyBarsResponse, error)
 	SyncStock(context.Context, *SyncStockRequest) (*Task, error)
 	ListDataTasks(context.Context, *ListDataTasksRequest) (*ListDataTasksResponse, error)
+	ListStockPool(context.Context, *ListStockPoolRequest) (*ListStockPoolResponse, error)
+	UpsertStockPoolItem(context.Context, *UpsertStockPoolItemRequest) (*StockPoolItem, error)
 }
 
 // UnimplementedDataServiceServer should be embedded to have
@@ -991,6 +1017,12 @@ func (UnimplementedDataServiceServer) SyncStock(context.Context, *SyncStockReque
 }
 func (UnimplementedDataServiceServer) ListDataTasks(context.Context, *ListDataTasksRequest) (*ListDataTasksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListDataTasks not implemented")
+}
+func (UnimplementedDataServiceServer) ListStockPool(context.Context, *ListStockPoolRequest) (*ListStockPoolResponse, error) {
+	return nil, status.Error(codes.Unimplemented, "method ListStockPool not implemented")
+}
+func (UnimplementedDataServiceServer) UpsertStockPoolItem(context.Context, *UpsertStockPoolItemRequest) (*StockPoolItem, error) {
+	return nil, status.Error(codes.Unimplemented, "method UpsertStockPoolItem not implemented")
 }
 func (UnimplementedDataServiceServer) testEmbeddedByValue() {}
 
@@ -1138,6 +1170,42 @@ func _DataService_ListDataTasks_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _DataService_ListStockPool_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(ListStockPoolRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataServiceServer).ListStockPool(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataService_ListStockPool_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataServiceServer).ListStockPool(ctx, req.(*ListStockPoolRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _DataService_UpsertStockPoolItem_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UpsertStockPoolItemRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(DataServiceServer).UpsertStockPoolItem(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: DataService_UpsertStockPoolItem_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(DataServiceServer).UpsertStockPoolItem(ctx, req.(*UpsertStockPoolItemRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // DataService_ServiceDesc is the grpc.ServiceDesc for DataService service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -1172,6 +1240,14 @@ var DataService_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "ListDataTasks",
 			Handler:    _DataService_ListDataTasks_Handler,
+		},
+		{
+			MethodName: "ListStockPool",
+			Handler:    _DataService_ListStockPool_Handler,
+		},
+		{
+			MethodName: "UpsertStockPoolItem",
+			Handler:    _DataService_UpsertStockPoolItem_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

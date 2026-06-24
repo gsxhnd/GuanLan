@@ -97,15 +97,31 @@ func (e *PythonDataSyncExecutor) Run(ctx context.Context, task data.DataSyncTask
 }
 
 func inferMarket(code string) data.Market {
-	code = strings.ToUpper(code)
-	if strings.HasSuffix(code, ".SH") || strings.HasSuffix(code, ".SZ") {
-		return data.MarketA
+	entry, err := data.ParsePoolSymbol(code, "")
+	if err != nil {
+		return data.MarketUS
 	}
-	return data.MarketUS
+	return entry.Market
 }
 
-// InitTrainingData 初始化预置训练指数成分股数据。
+// RunDailySync 对 stock_pool 执行增量日频同步（近 lookbackDays 天）。
+func RunDailySync(ctx context.Context, cfg PythonSyncConfig, lookbackDays int) error {
+	if lookbackDays <= 0 {
+		lookbackDays = 7
+	}
+	return runPythonModule(ctx, cfg, "daily-sync", "--lookback-days", fmt.Sprintf("%d", lookbackDays))
+}
+
+// InitTrainingData 兼容旧初始化流程。
 func InitTrainingData(ctx context.Context, cfg PythonSyncConfig, indexCodes ...string) error {
+	args := []string{"init-training"}
+	for _, code := range indexCodes {
+		args = append(args, "--index-code", code)
+	}
+	return runPythonModule(ctx, cfg, args...)
+}
+
+func runPythonModule(ctx context.Context, cfg PythonSyncConfig, args ...string) error {
 	pythonBin := cfg.PythonBin
 	if pythonBin == "" {
 		pythonBin = "uv"
@@ -126,23 +142,17 @@ func InitTrainingData(ctx context.Context, cfg PythonSyncConfig, indexCodes ...s
 		dbPath = filepath.Join(repoRoot, dbPath)
 	}
 
-	args := []string{"run", "python", "-m", "services.daily_data", "init-training", "--db", dbPath}
+	baseArgs := []string{"run", "python", "-m", "services.daily_data", "--db", dbPath}
 	if pythonBin != "uv" {
-		args = []string{"-m", "services.daily_data", "init-training", "--db", dbPath}
+		baseArgs = []string{"-m", "services.daily_data", "--db", dbPath}
 	}
-	for _, code := range indexCodes {
-		if pythonBin == "uv" {
-			args = append(args, "--index-code", code)
-		} else {
-			args = append(args, "--index-code", code)
-		}
-	}
+	baseArgs = append(baseArgs, args...)
 
 	var cmd *exec.Cmd
 	if pythonBin == "uv" {
-		cmd = exec.CommandContext(ctx, "uv", args...)
+		cmd = exec.CommandContext(ctx, "uv", baseArgs...)
 	} else {
-		cmd = exec.CommandContext(ctx, pythonBin, args...)
+		cmd = exec.CommandContext(ctx, pythonBin, baseArgs...)
 	}
 	cmd.Dir = repoRoot
 	cmd.Env = append(os.Environ(), "PYTHONPATH="+repoRoot)
@@ -154,7 +164,7 @@ func InitTrainingData(ctx context.Context, cfg PythonSyncConfig, indexCodes ...s
 		if msg == "" {
 			msg = err.Error()
 		}
-		return fmt.Errorf("init training: %s", msg)
+		return fmt.Errorf("%s: %s", args[0], msg)
 	}
 	return nil
 }

@@ -98,25 +98,16 @@ func (s *Scheduler) tick(ctx context.Context) {
 	}
 }
 
-// ScheduledSync 为活跃股票池创建定时 data_sync 任务。
-func ScheduledSync(ctx context.Context, store *data.Store) error {
-	codes, err := store.ListPendingDataSyncTargets(ctx)
-	if err != nil {
-		return err
-	}
-	for _, code := range codes {
-		_, err := store.CreateStockSyncTask(ctx, code, data.TriggerScheduled)
-		if err != nil {
-			log.Printf("scheduled sync %s: %v", code, err)
-		}
-	}
-	return nil
+// ScheduledSync 对 stock_pool 触发每日增量同步任务。
+func ScheduledSync(ctx context.Context, store *data.Store, cfg PythonSyncConfig, lookbackDays int) error {
+	_ = store
+	return RunDailySync(ctx, cfg, lookbackDays)
 }
 
-// StartScheduledTicker 启动定时触发器。
-func StartScheduledTicker(ctx context.Context, store *data.Store, interval time.Duration) func() {
+// StartScheduledTicker 启动定时 daily-sync（供独立调用）。
+func StartScheduledTicker(ctx context.Context, cfg PythonSyncConfig, lookbackDays int, interval time.Duration) func() {
 	if interval <= 0 {
-		interval = time.Hour
+		interval = 24 * time.Hour
 	}
 	ticker := time.NewTicker(interval)
 	done := make(chan struct{})
@@ -131,8 +122,8 @@ func StartScheduledTicker(ctx context.Context, store *data.Store, interval time.
 				ticker.Stop()
 				return
 			case <-ticker.C:
-				if err := ScheduledSync(ctx, store); err != nil {
-					log.Printf("scheduled sync: %v", err)
+				if err := RunDailySync(ctx, cfg, lookbackDays); err != nil {
+					log.Printf("scheduled daily-sync: %v", err)
 				}
 			}
 		}

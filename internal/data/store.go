@@ -68,6 +68,49 @@ func (s *Store) Migrate(ctx context.Context) error {
 	if _, err := s.db.ExecContext(ctx, schemaDDL); err != nil {
 		return fmt.Errorf("migrate schema: %w", err)
 	}
+	if err := s.migrateStockPoolV2(ctx); err != nil {
+		return err
+	}
+	return nil
+}
+
+// migrateStockPoolV2 将旧版 stock_pool（stock_code 主键）迁移为新结构。
+func (s *Store) migrateStockPoolV2(ctx context.Context) error {
+	var hasLegacy bool
+	row := s.db.QueryRowContext(ctx, `
+		SELECT COUNT(*) FROM information_schema.columns
+		WHERE table_name = 'stock_pool' AND column_name = 'stock_code'
+	`)
+	if err := row.Scan(&hasLegacy); err != nil {
+		return fmt.Errorf("inspect stock_pool schema: %w", err)
+	}
+	if !hasLegacy {
+		return nil
+	}
+	if _, err := s.db.ExecContext(ctx, `DROP TABLE stock_pool`); err != nil {
+		return fmt.Errorf("drop legacy stock_pool: %w", err)
+	}
+	const stockPoolDDL = `
+CREATE TABLE stock_pool (
+	yfinance_symbol  VARCHAR PRIMARY KEY,
+	original_code    VARCHAR NOT NULL,
+	market           VARCHAR NOT NULL,
+	exchange         VARCHAR,
+	stock_name       VARCHAR NOT NULL DEFAULT '',
+	currency         VARCHAR NOT NULL DEFAULT '',
+	source           VARCHAR NOT NULL,
+	is_active        BOOLEAN NOT NULL DEFAULT TRUE,
+	sync_daily       BOOLEAN NOT NULL DEFAULT TRUE,
+	created_at       TIMESTAMPTZ NOT NULL,
+	updated_at       TIMESTAMPTZ NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_stock_pool_market ON stock_pool (market);
+CREATE INDEX IF NOT EXISTS idx_stock_pool_source ON stock_pool (source);
+CREATE INDEX IF NOT EXISTS idx_stock_pool_sync_daily ON stock_pool (sync_daily);
+`
+	if _, err := s.db.ExecContext(ctx, stockPoolDDL); err != nil {
+		return fmt.Errorf("create stock_pool v2: %w", err)
+	}
 	return nil
 }
 

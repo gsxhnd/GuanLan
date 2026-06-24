@@ -76,6 +76,20 @@ export type WatchlistItem = {
   addedAt?: string
 }
 
+export type StockPoolItem = {
+  yfinanceSymbol: string
+  originalCode: string
+  market: string
+  stockName: string
+  exchange?: string
+  currency: string
+  source: string
+  isActive: boolean
+  syncDaily: boolean
+  createdAt?: string
+  updatedAt?: string
+}
+
 export const api = {
   listStocks(params?: { market?: string; status?: string; search?: string; sort?: string }) {
     const q = new URLSearchParams()
@@ -130,6 +144,16 @@ export const api = {
     return request<WatchlistItem>(
       `/watchlist/items/${encodeURIComponent(stockCode)}`,
       { method: "DELETE" }
+    )
+  },
+
+  listStockPool(params?: { source?: string; dailySyncOnly?: boolean }) {
+    const q = new URLSearchParams()
+    if (params?.source) q.set("source", params.source)
+    if (params?.dailySyncOnly) q.set("dailySyncOnly", "true")
+    const qs = q.toString()
+    return request<{ items: StockPoolItem[]; total: number }>(
+      `/data/pool${qs ? `?${qs}` : ""}`
     )
   },
 }

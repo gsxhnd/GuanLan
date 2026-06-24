@@ -11,10 +11,35 @@ import duckdb
 import pandas as pd
 
 
+def ensure_schema(conn: duckdb.DuckDBPyConnection) -> None:
+    legacy = conn.execute(
+        """
+        SELECT COUNT(*) FROM information_schema.columns
+        WHERE table_name = 'stock_pool' AND column_name = 'stock_code'
+        """
+    ).fetchone()
+    if legacy and legacy[0]:
+        conn.execute("DROP TABLE stock_pool")
+
+    exists = conn.execute(
+        """
+        SELECT 1 FROM information_schema.tables
+        WHERE table_name = 'stock_pool'
+        LIMIT 1
+        """
+    ).fetchone()
+    if exists:
+        return
+    schema_path = Path(__file__).with_name("schema.sql")
+    conn.execute(schema_path.read_text(encoding="utf-8"))
+
+
 def connect(db_path: str) -> duckdb.DuckDBPyConnection:
     path = Path(db_path)
     path.parent.mkdir(parents=True, exist_ok=True)
-    return duckdb.connect(str(path))
+    conn = duckdb.connect(str(path))
+    ensure_schema(conn)
+    return conn
 
 
 def new_data_version(description: str) -> str:

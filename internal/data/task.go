@@ -256,13 +256,13 @@ func (s *Store) UpdateDataSyncTaskStatus(ctx context.Context, taskID string, sta
 	return s.UpdateTaskStatus(ctx, taskID, status, failureReason, nil)
 }
 
-// ListPendingDataSyncTargets 返回活跃股票池中待同步的股票代码。
+// ListPendingDataSyncTargets 返回数据底座股票池中待同步代码。
 func (s *Store) ListPendingDataSyncTargets(ctx context.Context) ([]string, error) {
 	rows, err := s.db.QueryContext(ctx, `
-		SELECT w.stock_code
-		FROM watchlist_items w
-		LEFT JOIN stock_data_status s ON s.stock_code = w.stock_code
-		WHERE w.is_active = TRUE
+		SELECT p.yfinance_symbol
+		FROM stock_pool p
+		LEFT JOIN stock_data_status s ON s.stock_code = p.yfinance_symbol
+		WHERE p.is_active = TRUE AND p.sync_daily = TRUE
 		  AND (s.sync_status IS NULL OR s.sync_status IN (?, ?))
 	`, StockStatusMissing, StockStatusSyncing)
 	if err != nil {

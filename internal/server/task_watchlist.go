@@ -112,6 +112,8 @@ func (s *Services) AddWatchlistItem(ctx context.Context, req *pb.AddWatchlistIte
 		return nil, status.Errorf(codes.InvalidArgument, "add watchlist item: %v", err)
 	}
 
+	_ = s.Store.EnsureStockInPool(ctx, item.StockCode, item.Market, item.StockCode)
+
 	// 若 DuckDB 无就绪日频数据则自动创建获取任务
 	ready, err := s.Store.StockHasReadyData(ctx, item.StockCode)
 	if err != nil {
