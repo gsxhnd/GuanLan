@@ -100,9 +100,7 @@ Go API 通过 `uv run python -m services.daily_data` 调用日频服务；训练
 
 | 端点 | 说明 |
 |------|------|
-| `/api/data/indexes` | 指数数据状态 |
-| `/api/data/indexes/{index_code}/constituents` | 指数成分股快照 |
-| `/api/data/stocks` | 个股数据状态 |
+| `/api/data/stocks` | 股票池个股数据状态（基于 `stock_pool`） |
 | `/api/data/stocks/{stock_code}/daily-bars` | 个股日频行情，用于图表展示 |
 | `/api/data/stocks/{stock_code}/sync` | 为指定股票创建或重试日频数据获取任务 |
 | `/api/data/tasks` | 数据任务记录 |

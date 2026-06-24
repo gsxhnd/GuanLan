@@ -17,19 +17,22 @@ func TestStoreMigrateAndDataPageQueries(t *testing.T) {
 	now := time.Date(2026, 6, 23, 0, 0, 0, 0, time.UTC)
 	prev := now.AddDate(0, 0, -1)
 
-	if err := store.UpsertIndexDataset(ctx, IndexDataset{
-		IndexCode:        "000905.SH",
-		Market:           MarketA,
-		IndexName:        "中证500",
-		DataCompleteness: 98.6,
-		LastSyncTime:     &now,
-		SyncStatus:       "ready",
+	if err := store.UpsertStockPoolEntry(ctx, StockPoolEntry{
+		YfinanceSymbol: "600519.SS",
+		OriginalCode:   "600519",
+		Market:         MarketA,
+		StockName:      "贵州茅台",
+		Exchange:       "SH",
+		Currency:       "CNY",
+		Source:         PoolSourceCSVImport,
+		IsActive:       true,
+		SyncDaily:      true,
 	}); err != nil {
-		t.Fatalf("upsert index: %v", err)
+		t.Fatalf("upsert stock pool: %v", err)
 	}
 
 	if err := store.UpsertStockDataStatus(ctx, StockDataStatus{
-		StockCode:    "600519.SH",
+		StockCode:    "600519.SS",
 		StockName:    "贵州茅台",
 		Market:       MarketA,
 		Completeness: 99.2,
@@ -40,20 +43,12 @@ func TestStoreMigrateAndDataPageQueries(t *testing.T) {
 	}
 
 	for _, bar := range []DailyBar{
-		{StockCode: "600519.SH", Market: MarketA, TradeDate: prev, Open: 1680, High: 1690, Low: 1670, Close: 1688, Volume: 2_000_000, Source: "qlib", DataVersion: "v1"},
-		{StockCode: "600519.SH", Market: MarketA, TradeDate: now, Open: 1688, High: 1712.5, Low: 1675, Close: 1705.2, Volume: 2_840_000, Source: "qlib", DataVersion: "v1"},
+		{StockCode: "600519.SS", Market: MarketA, TradeDate: prev, Open: 1680, High: 1690, Low: 1670, Close: 1688, Volume: 2_000_000, Source: "yfinance", DataVersion: "v1"},
+		{StockCode: "600519.SS", Market: MarketA, TradeDate: now, Open: 1688, High: 1712.5, Low: 1675, Close: 1705.2, Volume: 2_840_000, Source: "yfinance", DataVersion: "v1"},
 	} {
 		if err := store.UpsertDailyBar(ctx, bar); err != nil {
 			t.Fatalf("upsert daily bar: %v", err)
 		}
-	}
-
-	indexes, err := store.ListIndexDatasets(ctx)
-	if err != nil {
-		t.Fatalf("list indexes: %v", err)
-	}
-	if len(indexes) != 1 || indexes[0].IndexCode != "000905.SH" {
-		t.Fatalf("unexpected indexes: %+v", indexes)
 	}
 
 	market := MarketA
@@ -64,6 +59,9 @@ func TestStoreMigrateAndDataPageQueries(t *testing.T) {
 	if len(stocks) != 1 {
 		t.Fatalf("expected 1 stock, got %d", len(stocks))
 	}
+	if stocks[0].StockCode != "600519.SS" {
+		t.Fatalf("unexpected stock code: %s", stocks[0].StockCode)
+	}
 	if stocks[0].Close != 1705.2 {
 		t.Fatalf("unexpected close: %v", stocks[0].Close)
 	}
@@ -71,7 +69,7 @@ func TestStoreMigrateAndDataPageQueries(t *testing.T) {
 		t.Fatalf("expected positive change, got %v", stocks[0].Change)
 	}
 
-	bars, err := store.ListDailyBars(ctx, ListDailyBarsParams{StockCode: "600519.SH"})
+	bars, err := store.ListDailyBars(ctx, ListDailyBarsParams{StockCode: "600519.SS"})
 	if err != nil {
 		t.Fatalf("list daily bars: %v", err)
 	}
@@ -79,7 +77,7 @@ func TestStoreMigrateAndDataPageQueries(t *testing.T) {
 		t.Fatalf("expected 2 bars, got %d", len(bars))
 	}
 
-	task, err := store.CreateStockSyncTask(ctx, "600519.SH", TriggerManual)
+	task, err := store.CreateStockSyncTask(ctx, "600519.SS", TriggerManual)
 	if err != nil {
 		t.Fatalf("create sync task: %v", err)
 	}

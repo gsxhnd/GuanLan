@@ -112,15 +112,6 @@ func RunDailySync(ctx context.Context, cfg PythonSyncConfig, lookbackDays int) e
 	return runPythonModule(ctx, cfg, "daily-sync", "--lookback-days", fmt.Sprintf("%d", lookbackDays))
 }
 
-// InitTrainingData 兼容旧初始化流程。
-func InitTrainingData(ctx context.Context, cfg PythonSyncConfig, indexCodes ...string) error {
-	args := []string{"init-training"}
-	for _, code := range indexCodes {
-		args = append(args, "--index-code", code)
-	}
-	return runPythonModule(ctx, cfg, args...)
-}
-
 func runPythonModule(ctx context.Context, cfg PythonSyncConfig, args ...string) error {
 	pythonBin := cfg.PythonBin
 	if pythonBin == "" {

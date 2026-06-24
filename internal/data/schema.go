@@ -2,24 +2,6 @@ package data
 
 // schemaDDL 创建数据页相关底层表。命名与 docs/dev/03-domain-model.md 字段对齐。
 const schemaDDL = `
-CREATE TABLE IF NOT EXISTS index_datasets (
-	index_code        VARCHAR PRIMARY KEY,
-	market            VARCHAR NOT NULL,
-	index_name        VARCHAR NOT NULL,
-	data_completeness DOUBLE NOT NULL DEFAULT 0,
-	last_sync_time    TIMESTAMPTZ,
-	sync_status       VARCHAR NOT NULL DEFAULT 'pending'
-);
-
-CREATE TABLE IF NOT EXISTS index_constituents (
-	index_code  VARCHAR NOT NULL,
-	stock_code  VARCHAR NOT NULL,
-	snap_date   DATE NOT NULL,
-	weight      DOUBLE,
-	is_active   BOOLEAN NOT NULL DEFAULT TRUE,
-	PRIMARY KEY (index_code, stock_code, snap_date)
-);
-
 CREATE TABLE IF NOT EXISTS daily_bars_raw (
 	stock_code   VARCHAR NOT NULL,
 	market       VARCHAR NOT NULL,

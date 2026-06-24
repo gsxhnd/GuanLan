@@ -66,28 +66,26 @@ func (s *Store) ListStocks(ctx context.Context, filter ListStocksFilter) ([]Stoc
 	)
 
 	if filter.Market != nil {
-		where = append(where, "s.market = ?")
+		where = append(where, "p.market = ?")
 		args = append(args, *filter.Market)
 	}
 	if filter.Status != nil {
-		where = append(where, "s.sync_status = ?")
+		where = append(where, "COALESCE(s.sync_status, 'missing') = ?")
 		args = append(args, *filter.Status)
 	}
 	if q := strings.TrimSpace(filter.Search); q != "" {
-		where = append(where, "(LOWER(s.stock_code) LIKE ? OR LOWER(s.stock_name) LIKE ?)")
+		where = append(where, "(LOWER(p.yfinance_symbol) LIKE ? OR LOWER(p.original_code) LIKE ? OR LOWER(p.stock_name) LIKE ?)")
 		like := "%" + strings.ToLower(q) + "%"
-		args = append(args, like, like)
+		args = append(args, like, like, like)
 	}
 
-	whereSQL := ""
-	if len(where) > 0 {
-		whereSQL = "WHERE " + strings.Join(where, " AND ")
-	}
+	where = append(where, "p.is_active = TRUE")
+	whereSQL := "WHERE " + strings.Join(where, " AND ")
 
-	orderBy := "s.stock_code"
+	orderBy := "p.yfinance_symbol"
 	switch filter.Sort {
 	case "name":
-		orderBy = "s.stock_name"
+		orderBy = "p.stock_name"
 	case "change":
 		orderBy = "change_pct DESC"
 	case "volume":
@@ -112,16 +110,16 @@ func (s *Store) ListStocks(ctx context.Context, filter ListStocksFilter) ([]Stoc
 			QUALIFY ROW_NUMBER() OVER (PARTITION BY stock_code ORDER BY trade_date DESC) = 1
 		)
 		SELECT
-			s.stock_code,
-			s.stock_name,
-			s.market,
+			p.yfinance_symbol,
+			COALESCE(NULLIF(s.stock_name, ''), p.stock_name),
+			p.market,
 			s.training_index_code,
 			s.data_start_date,
 			s.data_end_date,
-			s.completeness,
+			COALESCE(s.completeness, 0),
 			s.missing_ranges,
 			s.last_update,
-			s.sync_status,
+			COALESCE(s.sync_status, 'missing'),
 			COALESCE(latest.open, 0),
 			COALESCE(latest.high, 0),
 			COALESCE(latest.low, 0),
@@ -131,8 +129,9 @@ func (s *Store) ListStocks(ctx context.Context, filter ListStocksFilter) ([]Stoc
 				WHEN latest.prev_close IS NULL OR latest.prev_close = 0 THEN 0
 				ELSE (latest.close - latest.prev_close) / latest.prev_close * 100
 			END AS change_pct
-		FROM stock_data_status s
-		LEFT JOIN latest_bar latest ON latest.stock_code = s.stock_code
+		FROM stock_pool p
+		LEFT JOIN stock_data_status s ON s.stock_code = p.yfinance_symbol
+		LEFT JOIN latest_bar latest ON latest.stock_code = p.yfinance_symbol
 		%s
 		ORDER BY %s
 	`, whereSQL, orderBy)

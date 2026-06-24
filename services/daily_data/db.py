@@ -12,6 +12,9 @@ import pandas as pd
 
 
 def ensure_schema(conn: duckdb.DuckDBPyConnection) -> None:
+    conn.execute("DROP TABLE IF EXISTS index_constituents")
+    conn.execute("DROP TABLE IF EXISTS index_datasets")
+
     legacy = conn.execute(
         """
         SELECT COUNT(*) FROM information_schema.columns
@@ -201,50 +204,6 @@ def upsert_stock_status(
             now,
             sync_status,
         ],
-    )
-
-
-def upsert_index_dataset(
-    conn: duckdb.DuckDBPyConnection,
-    index_code: str,
-    market: str,
-    index_name: str,
-    completeness: float,
-    sync_status: str,
-) -> None:
-    now = datetime.now(timezone.utc)
-    conn.execute(
-        """
-        INSERT INTO index_datasets (
-            index_code, market, index_name, data_completeness, last_sync_time, sync_status
-        ) VALUES (?, ?, ?, ?, ?, ?)
-        ON CONFLICT (index_code) DO UPDATE SET
-            market = excluded.market,
-            index_name = excluded.index_name,
-            data_completeness = excluded.data_completeness,
-            last_sync_time = excluded.last_sync_time,
-            sync_status = excluded.sync_status
-        """,
-        [index_code, market, index_name, completeness, now, sync_status],
-    )
-
-
-def upsert_index_constituent(
-    conn: duckdb.DuckDBPyConnection,
-    index_code: str,
-    stock_code: str,
-    snap_date: date,
-    weight: float | None,
-) -> None:
-    conn.execute(
-        """
-        INSERT INTO index_constituents (index_code, stock_code, snap_date, weight, is_active)
-        VALUES (?, ?, ?, ?, TRUE)
-        ON CONFLICT (index_code, stock_code, snap_date) DO UPDATE SET
-            weight = excluded.weight,
-            is_active = TRUE
-        """,
-        [index_code, stock_code, snap_date, weight],
     )
 
 

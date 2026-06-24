@@ -851,24 +851,18 @@ var PortfolioService_ServiceDesc = grpc.ServiceDesc{
 }
 
 const (
-	DataService_ListIndexes_FullMethodName           = "/guanlan.v1.DataService/ListIndexes"
-	DataService_ListIndexConstituents_FullMethodName = "/guanlan.v1.DataService/ListIndexConstituents"
-	DataService_InitTrainingIndex_FullMethodName     = "/guanlan.v1.DataService/InitTrainingIndex"
-	DataService_ListStocks_FullMethodName            = "/guanlan.v1.DataService/ListStocks"
-	DataService_ListDailyBars_FullMethodName         = "/guanlan.v1.DataService/ListDailyBars"
-	DataService_SyncStock_FullMethodName             = "/guanlan.v1.DataService/SyncStock"
-	DataService_ListDataTasks_FullMethodName         = "/guanlan.v1.DataService/ListDataTasks"
-	DataService_ListStockPool_FullMethodName         = "/guanlan.v1.DataService/ListStockPool"
-	DataService_UpsertStockPoolItem_FullMethodName   = "/guanlan.v1.DataService/UpsertStockPoolItem"
+	DataService_ListStocks_FullMethodName          = "/guanlan.v1.DataService/ListStocks"
+	DataService_ListDailyBars_FullMethodName       = "/guanlan.v1.DataService/ListDailyBars"
+	DataService_SyncStock_FullMethodName           = "/guanlan.v1.DataService/SyncStock"
+	DataService_ListDataTasks_FullMethodName       = "/guanlan.v1.DataService/ListDataTasks"
+	DataService_ListStockPool_FullMethodName       = "/guanlan.v1.DataService/ListStockPool"
+	DataService_UpsertStockPoolItem_FullMethodName = "/guanlan.v1.DataService/UpsertStockPoolItem"
 )
 
 // DataServiceClient is the client API for DataService service.
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type DataServiceClient interface {
-	ListIndexes(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ListIndexesResponse, error)
-	ListIndexConstituents(ctx context.Context, in *ListIndexConstituentsRequest, opts ...grpc.CallOption) (*ListIndexConstituentsResponse, error)
-	InitTrainingIndex(ctx context.Context, in *InitTrainingIndexRequest, opts ...grpc.CallOption) (*Task, error)
 	ListStocks(ctx context.Context, in *ListStocksRequest, opts ...grpc.CallOption) (*ListStocksResponse, error)
 	ListDailyBars(ctx context.Context, in *ListDailyBarsRequest, opts ...grpc.CallOption) (*ListDailyBarsResponse, error)
 	SyncStock(ctx context.Context, in *SyncStockRequest, opts ...grpc.CallOption) (*Task, error)
@@ -883,36 +877,6 @@ type dataServiceClient struct {
 
 func NewDataServiceClient(cc grpc.ClientConnInterface) DataServiceClient {
 	return &dataServiceClient{cc}
-}
-
-func (c *dataServiceClient) ListIndexes(ctx context.Context, in *Empty, opts ...grpc.CallOption) (*ListIndexesResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListIndexesResponse)
-	err := c.cc.Invoke(ctx, DataService_ListIndexes_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dataServiceClient) ListIndexConstituents(ctx context.Context, in *ListIndexConstituentsRequest, opts ...grpc.CallOption) (*ListIndexConstituentsResponse, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(ListIndexConstituentsResponse)
-	err := c.cc.Invoke(ctx, DataService_ListIndexConstituents_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
-}
-
-func (c *dataServiceClient) InitTrainingIndex(ctx context.Context, in *InitTrainingIndexRequest, opts ...grpc.CallOption) (*Task, error) {
-	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
-	out := new(Task)
-	err := c.cc.Invoke(ctx, DataService_InitTrainingIndex_FullMethodName, in, out, cOpts...)
-	if err != nil {
-		return nil, err
-	}
-	return out, nil
 }
 
 func (c *dataServiceClient) ListStocks(ctx context.Context, in *ListStocksRequest, opts ...grpc.CallOption) (*ListStocksResponse, error) {
@@ -979,9 +943,6 @@ func (c *dataServiceClient) UpsertStockPoolItem(ctx context.Context, in *UpsertS
 // All implementations should embed UnimplementedDataServiceServer
 // for forward compatibility.
 type DataServiceServer interface {
-	ListIndexes(context.Context, *Empty) (*ListIndexesResponse, error)
-	ListIndexConstituents(context.Context, *ListIndexConstituentsRequest) (*ListIndexConstituentsResponse, error)
-	InitTrainingIndex(context.Context, *InitTrainingIndexRequest) (*Task, error)
 	ListStocks(context.Context, *ListStocksRequest) (*ListStocksResponse, error)
 	ListDailyBars(context.Context, *ListDailyBarsRequest) (*ListDailyBarsResponse, error)
 	SyncStock(context.Context, *SyncStockRequest) (*Task, error)
@@ -997,15 +958,6 @@ type DataServiceServer interface {
 // pointer dereference when methods are called.
 type UnimplementedDataServiceServer struct{}
 
-func (UnimplementedDataServiceServer) ListIndexes(context.Context, *Empty) (*ListIndexesResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListIndexes not implemented")
-}
-func (UnimplementedDataServiceServer) ListIndexConstituents(context.Context, *ListIndexConstituentsRequest) (*ListIndexConstituentsResponse, error) {
-	return nil, status.Error(codes.Unimplemented, "method ListIndexConstituents not implemented")
-}
-func (UnimplementedDataServiceServer) InitTrainingIndex(context.Context, *InitTrainingIndexRequest) (*Task, error) {
-	return nil, status.Error(codes.Unimplemented, "method InitTrainingIndex not implemented")
-}
 func (UnimplementedDataServiceServer) ListStocks(context.Context, *ListStocksRequest) (*ListStocksResponse, error) {
 	return nil, status.Error(codes.Unimplemented, "method ListStocks not implemented")
 }
@@ -1042,60 +994,6 @@ func RegisterDataServiceServer(s grpc.ServiceRegistrar, srv DataServiceServer) {
 		t.testEmbeddedByValue()
 	}
 	s.RegisterService(&DataService_ServiceDesc, srv)
-}
-
-func _DataService_ListIndexes_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(Empty)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DataServiceServer).ListIndexes(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: DataService_ListIndexes_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DataServiceServer).ListIndexes(ctx, req.(*Empty))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _DataService_ListIndexConstituents_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(ListIndexConstituentsRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DataServiceServer).ListIndexConstituents(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: DataService_ListIndexConstituents_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DataServiceServer).ListIndexConstituents(ctx, req.(*ListIndexConstituentsRequest))
-	}
-	return interceptor(ctx, in, info, handler)
-}
-
-func _DataService_InitTrainingIndex_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
-	in := new(InitTrainingIndexRequest)
-	if err := dec(in); err != nil {
-		return nil, err
-	}
-	if interceptor == nil {
-		return srv.(DataServiceServer).InitTrainingIndex(ctx, in)
-	}
-	info := &grpc.UnaryServerInfo{
-		Server:     srv,
-		FullMethod: DataService_InitTrainingIndex_FullMethodName,
-	}
-	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
-		return srv.(DataServiceServer).InitTrainingIndex(ctx, req.(*InitTrainingIndexRequest))
-	}
-	return interceptor(ctx, in, info, handler)
 }
 
 func _DataService_ListStocks_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
@@ -1213,18 +1111,6 @@ var DataService_ServiceDesc = grpc.ServiceDesc{
 	ServiceName: "guanlan.v1.DataService",
 	HandlerType: (*DataServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
-		{
-			MethodName: "ListIndexes",
-			Handler:    _DataService_ListIndexes_Handler,
-		},
-		{
-			MethodName: "ListIndexConstituents",
-			Handler:    _DataService_ListIndexConstituents_Handler,
-		},
-		{
-			MethodName: "InitTrainingIndex",
-			Handler:    _DataService_InitTrainingIndex_Handler,
-		},
 		{
 			MethodName: "ListStocks",
 			Handler:    _DataService_ListStocks_Handler,

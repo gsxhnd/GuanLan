@@ -130,12 +130,12 @@ def main() -> int:
     parser.add_argument(
         "--csv",
         type=Path,
-        default=Path("data/imports/000510cons.csv"),
+        default=Path("data/000510cons.csv"),
         help="CSI-style constituent CSV (default: A500)",
     )
     parser.add_argument(
         "--db",
-        default="data/duckdb/guanlan.duckdb",
+        default="data/guanlan.duckdb",
         help="DuckDB database path",
     )
     parser.add_argument("--dry-run", action="store_true", help="Parse only, do not write")

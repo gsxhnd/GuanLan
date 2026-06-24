@@ -26,8 +26,8 @@ import {
 import {
   api,
   type DailyBar,
-  type IndexDataset,
   type StockListItem,
+  type StockPoolItem,
   type Task,
 } from "@/lib/api"
 import { useToast } from "@/hooks/use-toast"
@@ -88,25 +88,25 @@ export function DataPage() {
   const [range, setRange] = useState(60)
 
   const [stocks, setStocks] = useState<StockListItem[]>([])
-  const [indexes, setIndexes] = useState<IndexDataset[]>([])
+  const [poolItems, setPoolItems] = useState<StockPoolItem[]>([])
   const [tasks, setTasks] = useState<Task[]>([])
   const [bars, setBars] = useState<DailyBar[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
 
   const loadMeta = useCallback(async () => {
-    const [stockRes, indexRes, taskRes] = await Promise.all([
+    const [stockRes, poolRes, taskRes] = await Promise.all([
       api.listStocks({
         market: market === "all" ? undefined : market,
         status: status === "all" ? undefined : status,
         search: query || undefined,
         sort,
       }),
-      api.listIndexes(),
+      api.listStockPool(),
       api.listDataTasks(20),
     ])
     setStocks(stockRes.stocks ?? [])
-    setIndexes(indexRes.indexes ?? [])
+    setPoolItems(poolRes.items ?? [])
     setTasks(taskRes.tasks ?? [])
     if (!selected && stockRes.stocks?.[0]) {
       setSelected(stockRes.stocks[0].stockCode)
@@ -386,34 +386,35 @@ export function DataPage() {
       </div>
 
       <div className="grid grid-cols-1 gap-4 lg:grid-cols-2">
-        <ContentCard title="预置训练指数" noPadding bodyClassName="p-0">
-          {indexes.length === 0 ? (
-            <EmptyState title="暂无指数" description="指数数据需单独初始化" />
+        <ContentCard title="股票池" noPadding bodyClassName="p-0">
+          {poolItems.length === 0 ? (
+            <EmptyState title="股票池为空" description="运行 scripts/import_stock_pool_csv.py 导入成分股" />
           ) : (
             <DataTable>
               <DataTableHead>
-                <DataTableTh>指数</DataTableTh>
+                <DataTableTh>yfinance</DataTableTh>
+                <DataTableTh>原始代码</DataTableTh>
+                <DataTableTh>名称</DataTableTh>
                 <DataTableTh>市场</DataTableTh>
-                <DataTableTh numeric>完整率</DataTableTh>
-                <DataTableTh>最近同步</DataTableTh>
-                <DataTableTh>状态</DataTableTh>
+                <DataTableTh>来源</DataTableTh>
               </DataTableHead>
               <DataTableBody>
-                {indexes.map((idx) => (
-                  <DataTableRow key={idx.indexCode}>
-                    <DataTableTd mono>{idx.indexCode}</DataTableTd>
-                    <DataTableTd>{marketLabel(idx.market as "A" | "US")}</DataTableTd>
-                    <DataTableTd numeric>{idx.dataCompleteness.toFixed(1)}%</DataTableTd>
-                    <DataTableTd mono>{formatUpdated(idx.lastSyncTime)}</DataTableTd>
-                    <DataTableTd>
-                      <StatusBadge variant={idx.syncStatus === "ready" ? "success" : "warn"} dot>
-                        {idx.syncStatus}
-                      </StatusBadge>
-                    </DataTableTd>
+                {poolItems.slice(0, 20).map((item) => (
+                  <DataTableRow key={item.yfinanceSymbol}>
+                    <DataTableTd mono>{item.yfinanceSymbol}</DataTableTd>
+                    <DataTableTd mono>{item.originalCode}</DataTableTd>
+                    <DataTableTd>{item.stockName}</DataTableTd>
+                    <DataTableTd>{marketLabel(item.market as "A" | "US")}</DataTableTd>
+                    <DataTableTd>{item.source}</DataTableTd>
                   </DataTableRow>
                 ))}
               </DataTableBody>
             </DataTable>
+          )}
+          {poolItems.length > 20 && (
+            <p className="px-4 py-2 text-xs text-muted-foreground">
+              显示前 20 条，共 {poolItems.length} 只
+            </p>
           )}
         </ContentCard>
 

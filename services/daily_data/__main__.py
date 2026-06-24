@@ -9,7 +9,6 @@ from __future__ import annotations
 import argparse
 import sys
 import time
-from pathlib import Path
 
 from services.daily_data import db, pipeline
 
@@ -63,24 +62,6 @@ def cmd_run_scheduler(args: argparse.Namespace) -> int:
         time.sleep(interval)
 
 
-def cmd_init_training(args: argparse.Namespace) -> int:
-    indices = Path(args.indices) if args.indices else (
-        Path(__file__).resolve().parents[2] / "services/daily_data/training/indices.json"
-    )
-    conn = db.connect(args.db)
-    try:
-        codes = args.index_code or ["000905.SH", "000510.SH"]
-        for code in codes:
-            version = pipeline.init_training_index(conn, code, indices)
-            print(f"{code}\t{version}")
-        return 0
-    except Exception as exc:
-        print(str(exc), file=sys.stderr)
-        return 1
-    finally:
-        conn.close()
-
-
 def main() -> int:
     parser = argparse.ArgumentParser(
         prog="services.daily_data",
@@ -103,11 +84,6 @@ def main() -> int:
     sched.add_argument("--interval-hours", type=float, default=24)
     sched.add_argument("--lookback-days", type=int, default=7)
     sched.set_defaults(func=cmd_run_scheduler)
-
-    init = sub.add_parser("init-training", help="(legacy) 按旧 indices.json 初始化")
-    init.add_argument("--index-code", action="append")
-    init.add_argument("--indices")
-    init.set_defaults(func=cmd_init_training)
 
     args = parser.parse_args()
     if args.command == "run-scheduler":

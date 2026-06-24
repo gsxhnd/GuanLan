@@ -25,96 +25,6 @@
     "application/json"
   ],
   "paths": {
-    "/api/data/indexes": {
-      "get": {
-        "operationId": "DataService_ListIndexes",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ListIndexesResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "tags": [
-          "DataService"
-        ]
-      }
-    },
-    "/api/data/indexes/{indexCode}/constituents": {
-      "get": {
-        "operationId": "DataService_ListIndexConstituents",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1ListIndexConstituentsResponse"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "indexCode",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          }
-        ],
-        "tags": [
-          "DataService"
-        ]
-      }
-    },
-    "/api/data/indexes/{indexCode}/init": {
-      "post": {
-        "operationId": "DataService_InitTrainingIndex",
-        "responses": {
-          "200": {
-            "description": "A successful response.",
-            "schema": {
-              "$ref": "#/definitions/v1Task"
-            }
-          },
-          "default": {
-            "description": "An unexpected error response.",
-            "schema": {
-              "$ref": "#/definitions/rpcStatus"
-            }
-          }
-        },
-        "parameters": [
-          {
-            "name": "indexCode",
-            "in": "path",
-            "required": true,
-            "type": "string"
-          },
-          {
-            "name": "body",
-            "in": "body",
-            "required": true,
-            "schema": {
-              "$ref": "#/definitions/DataServiceInitTrainingIndexBody"
-            }
-          }
-        ],
-        "tags": [
-          "DataService"
-        ]
-      }
-    },
     "/api/data/pool": {
       "get": {
         "operationId": "DataService_ListStockPool",
@@ -904,9 +814,6 @@
     }
   },
   "definitions": {
-    "DataServiceInitTrainingIndexBody": {
-      "type": "object"
-    },
     "DataServiceSyncStockBody": {
       "type": "object"
     },
@@ -1252,52 +1159,6 @@
         }
       }
     },
-    "v1IndexConstituent": {
-      "type": "object",
-      "properties": {
-        "indexCode": {
-          "type": "string"
-        },
-        "stockCode": {
-          "type": "string"
-        },
-        "snapDate": {
-          "type": "string"
-        },
-        "weight": {
-          "type": "number",
-          "format": "double"
-        },
-        "isActive": {
-          "type": "boolean"
-        }
-      }
-    },
-    "v1IndexDataset": {
-      "type": "object",
-      "properties": {
-        "indexCode": {
-          "type": "string"
-        },
-        "market": {
-          "type": "string"
-        },
-        "indexName": {
-          "type": "string"
-        },
-        "dataCompleteness": {
-          "type": "number",
-          "format": "double"
-        },
-        "lastSyncTime": {
-          "type": "string",
-          "format": "date-time"
-        },
-        "syncStatus": {
-          "type": "string"
-        }
-      }
-    },
     "v1ListCashFlowsResponse": {
       "type": "object",
       "properties": {
@@ -1342,30 +1203,6 @@
           "items": {
             "type": "object",
             "$ref": "#/definitions/v1Dividend"
-          }
-        }
-      }
-    },
-    "v1ListIndexConstituentsResponse": {
-      "type": "object",
-      "properties": {
-        "constituents": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1IndexConstituent"
-          }
-        }
-      }
-    },
-    "v1ListIndexesResponse": {
-      "type": "object",
-      "properties": {
-        "indexes": {
-          "type": "array",
-          "items": {
-            "type": "object",
-            "$ref": "#/definitions/v1IndexDataset"
           }
         }
       }

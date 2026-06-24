@@ -325,39 +325,6 @@ service PortfolioService {
 
 // --- Data ---
 
-message IndexDataset {
-  string index_code = 1;
-  string market = 2;
-  string index_name = 3;
-  double data_completeness = 4;
-  google.protobuf.Timestamp last_sync_time = 5;
-  string sync_status = 6;
-}
-
-message ListIndexesResponse {
-  repeated IndexDataset indexes = 1;
-}
-
-message IndexConstituent {
-  string index_code = 1;
-  string stock_code = 2;
-  string snap_date = 3;
-  double weight = 4;
-  bool is_active = 5;
-}
-
-message ListIndexConstituentsRequest {
-  string index_code = 1;
-}
-
-message ListIndexConstituentsResponse {
-  repeated IndexConstituent constituents = 1;
-}
-
-message InitTrainingIndexRequest {
-  string index_code = 1;
-}
-
 message StockListItem {
   string stock_code = 1;
   string stock_name = 2;
@@ -457,15 +424,6 @@ message UpsertStockPoolItemRequest {
 }
 
 service DataService {
-  rpc ListIndexes(Empty) returns (ListIndexesResponse) {
-    option (google.api.http) = {get: "/api/data/indexes"};
-  }
-  rpc ListIndexConstituents(ListIndexConstituentsRequest) returns (ListIndexConstituentsResponse) {
-    option (google.api.http) = {get: "/api/data/indexes/{index_code}/constituents"};
-  }
-  rpc InitTrainingIndex(InitTrainingIndexRequest) returns (Task) {
-    option (google.api.http) = {post: "/api/data/indexes/{index_code}/init" body: "*"};
-  }
   rpc ListStocks(ListStocksRequest) returns (ListStocksResponse) {
     option (google.api.http) = {get: "/api/data/stocks"};
   }

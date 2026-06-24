@@ -50,25 +50,6 @@ const (
 	TaskStatusCancelled      TaskStatus = "cancelled"
 )
 
-// IndexDataset 预置训练指数数据集状态（§4.1）。
-type IndexDataset struct {
-	IndexCode        string     `json:"index_code"`
-	Market           Market     `json:"market"`
-	IndexName        string     `json:"index_name"`
-	DataCompleteness float64    `json:"data_completeness"`
-	LastSyncTime     *time.Time `json:"last_sync_time,omitempty"`
-	SyncStatus       string     `json:"sync_status"`
-}
-
-// IndexConstituent 指数成分股快照（§4.2）。
-type IndexConstituent struct {
-	IndexCode string     `json:"index_code"`
-	StockCode string     `json:"stock_code"`
-	SnapDate  time.Time  `json:"snap_date"`
-	Weight    *float64   `json:"weight,omitempty"`
-	IsActive  bool       `json:"is_active"`
-}
-
 // DailyBar 日频行情（§4.3）。
 type DailyBar struct {
 	StockCode   string    `json:"stock_code"`

@@ -42,15 +42,6 @@ export type DailyBar = {
   qualityStatus?: string
 }
 
-export type IndexDataset = {
-  indexCode: string
-  market: string
-  indexName: string
-  dataCompleteness: number
-  lastSyncTime?: string
-  syncStatus: string
-}
-
 export type Task = {
   taskId: string
   taskType: string
@@ -105,10 +96,6 @@ export const api = {
     return request<{ bars: DailyBar[] }>(
       `/data/stocks/${encodeURIComponent(stockCode)}/daily-bars?limit=${limit}`
     )
-  },
-
-  listIndexes() {
-    return request<{ indexes: IndexDataset[] }>("/data/indexes")
   },
 
   listDataTasks(limit = 20) {
