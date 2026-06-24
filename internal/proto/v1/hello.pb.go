@@ -124,9 +124,9 @@ const file_v1_hello_proto_rawDesc = "" +
 	"HelloReply\x12\x18\n" +
 	"\amessage\x18\x01 \x01(\tR\amessage2d\n" +
 	"\aGreeter\x12Y\n" +
-	"\bSayHello\x12\x18.helloworld.HelloRequest\x1a\x16.helloworld.HelloReply\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/v1/example/echoB\x86\x01\n" +
+	"\bSayHello\x12\x18.helloworld.HelloRequest\x1a\x16.helloworld.HelloReply\"\x1b\x82\xd3\xe4\x93\x02\x15:\x01*\"\x10/v1/example/echoB\x91\x01\n" +
 	"\x0ecom.helloworldB\n" +
-	"HelloProtoP\x01Z github.com/gsxhnd/guanlan/gen;v1\xa2\x02\x03HXX\xaa\x02\n" +
+	"HelloProtoP\x01Z+github.com/gsxhnd/guanlan/internal/proto;v1\xa2\x02\x03HXX\xaa\x02\n" +
 	"Helloworld\xca\x02\n" +
 	"Helloworld\xe2\x02\x16Helloworld\\GPBMetadata\xea\x02\n" +
 	"Helloworldb\x06proto3"

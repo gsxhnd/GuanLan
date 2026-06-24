@@ -4,4 +4,10 @@ version = "0.1.0"
 description = "Add your description here"
 readme = "README.md"
 requires-python = ">=3.12"
-dependencies = []
+dependencies = [
+    "yfinance>=1.4.1",
+]
+
+# Python 能力按服务划分，见 services/daily_data/（日频数据）、后续 inference/、training/
+[tool.uv]
+package = false
