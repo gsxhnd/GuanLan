@@ -21,8 +21,8 @@ buf mod update
 [yahoo finance数据下载](https://github.com/ranaroussi/yfinance)
 [回测框架](https://github.com/mementum/backtrader)
 
-
 添加新功能 记录我操作股票/基金的记录
+
 - 建仓/加仓/减仓/清仓 记录
 - 买入/卖出 记录包含的 税费、佣金、滑点、流动性成本
 - 成本的计算
