@@ -1,0 +1,45 @@
+# Air hot-reload configuration for GuanLan Gateway (HTTP/gRPC-Gateway) server
+root = "."
+tmp_dir = "tmp"
+
+[build]
+  cmd = ""
+  bin = ""
+  full_bin = "go run ./cmd/gateway/"
+  args_bin = []
+  include_ext = ["go", "tpl", "tmpl", "html", "mod", "sum"]
+  include_dir = ["cmd", "internal", "pkg"]
+  include_file = []
+  exclude_dir = ["assets", "tmp", "vendor", "testdata", "web", "services", "node_modules", "docs", "scripts", ".codebuddy"]
+  exclude_file = []
+  exclude_regex = ["_test\\.go"]
+  exclude_unchanged = false
+  follow_symlink = false
+  poll = false
+  poll_interval = 0
+  delay = 500
+  stop_on_error = false
+  send_interrupt = false
+  kill_delay = "500ms"
+  rerun = false
+  rerun_delay = 500
+  log = "build-errors-gateway.log"
+
+[log]
+  main_only = false
+  time = true
+  add_timestamp = true
+
+[color]
+  main = "magenta"
+  watcher = "cyan"
+  build = "yellow"
+  runner = "green"
+  app = ""
+
+[misc]
+  clean_on_exit = true
+
+[screen]
+  clear_on_rebuild = false
+  keep_scrolling = true

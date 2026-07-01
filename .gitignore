@@ -25,3 +25,7 @@ __pycache__/
 
 # Runtime data
 data/*
+
+# Go build artifacts
+tmp/
+build-errors-*.log
