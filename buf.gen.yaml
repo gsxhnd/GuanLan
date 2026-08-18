@@ -4,30 +4,23 @@ managed:
   disable:
     # Don't modify any files in buf.build/googleapis/googleapis
     - module: buf.build/googleapis/googleapis
-  # override:
-  #   - file_option: go_package_prefix
-  #     value: x123/gen
 
 plugins:
-  # - remote: buf.build/protocolbuffers/go
   - local: protoc-gen-go
     out: internal/proto
     opt: paths=source_relative
-  # - remote: buf.build/grpc/go:v1.6.1
   - local: protoc-gen-go-grpc
     out: internal/proto
     opt: paths=source_relative,require_unimplemented_servers=false
-  # - remote: buf.build/grpc-ecosystem/gateway:v2.28.0
-  - local: protoc-gen-grpc-gateway
+  - local: protoc-gen-go-http
     out: internal/proto
     opt: paths=source_relative
-  # - remote: buf.build/grpc-ecosystem/openapiv2:v2.28.0
   - local: protoc-gen-openapiv2
     out: docs/openapi
-  # - remote: buf.build/protocolbuffers/python
-  #   out: gen/python
-  # - remote: buf.build/grpc/python
-  #   out: gen/python
+  - remote: buf.build/protocolbuffers/python
+    out: .
+  - remote: buf.build/grpc/python
+    out: .
 
 inputs:
   - directory: proto

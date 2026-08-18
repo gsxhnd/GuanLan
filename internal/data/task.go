@@ -90,26 +90,6 @@ func (s *Store) CreateTask(ctx context.Context, taskType TaskType, target string
 	return task, nil
 }
 
-// CreateStockSyncTask 为指定股票创建日频同步任务。
-func (s *Store) CreateStockSyncTask(ctx context.Context, stockCode string, trigger TriggerMethod) (DataSyncTask, error) {
-	if stockCode == "" {
-		return DataSyncTask{}, fmt.Errorf("stock_code is required")
-	}
-
-	task, err := s.CreateTask(ctx, TaskTypeDataSync, stockCode, trigger, 0)
-	if err != nil {
-		return DataSyncTask{}, err
-	}
-
-	_, err = s.db.ExecContext(ctx, `
-		UPDATE stock_data_status SET sync_status = ? WHERE stock_code = ?
-	`, StockStatusSyncing, stockCode)
-	if err != nil {
-		return DataSyncTask{}, fmt.Errorf("mark stock syncing: %w", err)
-	}
-	return task, nil
-}
-
 // GetTask 按 ID 查询任务。
 func (s *Store) GetTask(ctx context.Context, taskID string) (DataSyncTask, error) {
 	row := s.db.QueryRowContext(ctx, `
@@ -172,19 +152,6 @@ func (s *Store) ListTasks(ctx context.Context, taskType *TaskType, limit int) ([
 func (s *Store) ListDataSyncTasks(ctx context.Context, limit int) ([]DataSyncTask, error) {
 	t := TaskTypeDataSync
 	return s.ListTasks(ctx, &t, limit)
-}
-
-// RetryTask 基于失败任务创建重试任务。
-func (s *Store) RetryTask(ctx context.Context, taskID string) (DataSyncTask, error) {
-	prev, err := s.GetTask(ctx, taskID)
-	if err != nil {
-		return DataSyncTask{}, err
-	}
-	if prev.Status != TaskStatusFailed {
-		return DataSyncTask{}, fmt.Errorf("task %s is not failed", taskID)
-	}
-
-	return s.CreateTask(ctx, prev.TaskType, prev.TargetObject, TriggerRetry, prev.RetryCount+1)
 }
 
 // ClaimPendingTask 领取一个 pending 任务并标记为 running。

@@ -5,7 +5,7 @@ import (
 	"time"
 
 	"github.com/gsxhnd/guanlan/internal/data"
-	pb "github.com/gsxhnd/guanlan/internal/proto/v1"
+	pb "github.com/gsxhnd/guanlan/internal/proto/quant/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -75,7 +75,7 @@ func (s *Services) CreateDividend(ctx context.Context, req *pb.CreateDividendReq
 		v := req.GetDividendPerShare()
 		perShare = &v
 	}
-	div, err := s.Store.CreateDividend(ctx, data.PortfolioDividend{
+	div, err := s.Biz.Portfolio.CreateDividend(ctx, data.PortfolioDividend{
 		DividendDate:     divDate,
 		StockCode:        req.GetStockCode(),
 		DividendPerShare: perShare,
@@ -162,7 +162,7 @@ func (s *Services) ListCashFlows(ctx context.Context, req *pb.ListCashFlowsReque
 }
 
 func (s *Services) ListPositions(ctx context.Context, _ *pb.Empty) (*pb.ListPositionsResponse, error) {
-	positions, cash, err := s.Store.ComputePositions(ctx)
+	positions, cash, err := s.Biz.Portfolio.ComputePositions(ctx)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "list positions: %v", err)
 	}
@@ -261,7 +261,7 @@ func (s *Services) GetAssets(ctx context.Context, req *pb.GetAssetsRequest) (*pb
 		}
 		endDate = &t
 	}
-	cash, holding, total, snaps, err := s.Store.GetAssets(ctx, startDate, endDate)
+	cash, holding, total, snaps, err := s.Biz.Portfolio.GetAssets(ctx, startDate, endDate)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "get assets: %v", err)
 	}
@@ -288,7 +288,7 @@ func (s *Services) GetAnnualReview(ctx context.Context, req *pb.GetAnnualReviewR
 	if year == 0 {
 		year = 0
 	}
-	review, err := s.Store.GetAnnualReview(ctx, year)
+	review, err := s.Biz.Portfolio.GetAnnualReview(ctx, year)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, "get annual review: %v", err)
 	}

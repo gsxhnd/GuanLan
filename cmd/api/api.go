@@ -3,119 +3,130 @@ package main
 import (
 	"context"
 	"log"
-	"net"
-	"time"
 
+	"github.com/gsxhnd/guanlan/internal/biz"
+	glcron "github.com/gsxhnd/guanlan/internal/cron"
 	"github.com/gsxhnd/guanlan/internal/data"
+	"github.com/gsxhnd/guanlan/internal/orchestrator"
+	pb "github.com/gsxhnd/guanlan/internal/proto/quant/v1"
 	"github.com/gsxhnd/guanlan/internal/server"
-	"github.com/gsxhnd/guanlan/internal/task"
-	pb "github.com/gsxhnd/guanlan/internal/proto/v1"
+	httpx "github.com/gsxhnd/guanlan/internal/transport/http"
+	khttp "github.com/go-kratos/kratos/v2/transport/http"
 	"go.uber.org/fx"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 )
 
-type runtimeState struct {
-	cancelScheduled context.CancelFunc
+type pythonConns struct {
+	crawler *grpc.ClientConn
+	predict *grpc.ClientConn
 }
 
 func NewStore(cfg Config) (*data.Store, error) {
 	return data.Open(cfg.DBPath)
 }
 
-func NewServices(store *data.Store, cfg Config) *server.Services {
-	return &server.Services{
-		Store: store,
-		Python: task.PythonSyncConfig{
-			PythonBin: cfg.PythonBin,
-			RepoRoot:  cfg.RepoRoot,
-			DBPath:    cfg.DBPath,
-		},
-	}
+func NewBiz(store *data.Store) *biz.Services {
+	return biz.New(store)
 }
 
-func NewScheduler(store *data.Store, cfg Config) *task.Scheduler {
-	exec := &task.PythonDataSyncExecutor{
-		Store: store,
-		Config: task.PythonSyncConfig{
-			PythonBin: cfg.PythonBin,
-			RepoRoot:  cfg.RepoRoot,
-			DBPath:    cfg.DBPath,
-		},
+func NewPythonClients(cfg Config) (pb.CrawlerServiceClient, pb.PredictionServiceClient, *pythonConns, error) {
+	crawlerConn, err := grpc.NewClient(cfg.CrawlerAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, nil, nil, err
 	}
-	return task.NewScheduler(store, exec, cfg.TaskPollInterval)
+	predictConn, err := grpc.NewClient(cfg.PredictionAddr, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		_ = crawlerConn.Close()
+		return nil, nil, nil, err
+	}
+	return pb.NewCrawlerServiceClient(crawlerConn),
+		pb.NewPredictionServiceClient(predictConn),
+		&pythonConns{crawler: crawlerConn, predict: predictConn},
+		nil
 }
 
-func NewGRPCServer(svc *server.Services) *grpc.Server {
-	srv := grpc.NewServer()
-	pb.RegisterTaskServiceServer(srv, svc)
-	pb.RegisterWatchlistServiceServer(srv, svc)
-	pb.RegisterPortfolioServiceServer(srv, svc)
-	pb.RegisterDataServiceServer(srv, svc)
+func NewPredictExecutor(store *data.Store, predict pb.PredictionServiceClient) *orchestrator.PredictExecutor {
+	return &orchestrator.PredictExecutor{Store: store, Client: predict}
+}
+
+func NewServices(store *data.Store, bizSvc *biz.Services, predict *orchestrator.PredictExecutor) *server.Services {
+	return &server.Services{Store: store, Biz: bizSvc, Predict: predict}
+}
+
+func NewScheduler(
+	store *data.Store,
+	crawler pb.CrawlerServiceClient,
+	predict *orchestrator.PredictExecutor,
+	cfg Config,
+) *orchestrator.Scheduler {
+	exec := &orchestrator.Dispatcher{
+		Sync: &orchestrator.SyncExecutor{
+			Store:        store,
+			Crawler:      crawler,
+			LookbackDays: cfg.SyncLookbackDays,
+		},
+		Predict: predict,
+	}
+	return orchestrator.NewScheduler(store, exec, cfg.TaskPollInterval)
+}
+
+func NewCron(bizSvc *biz.Services, cfg Config) (*glcron.Scheduler, error) {
+	return glcron.New(bizSvc, cfg.DailySyncCron)
+}
+
+func NewHTTPServer(cfg Config, svc *server.Services) *khttp.Server {
+	srv := httpx.NewServer(cfg.HTTPAddr)
+	pb.RegisterTaskServiceHTTPServer(srv, svc)
+	pb.RegisterWatchlistServiceHTTPServer(srv, svc)
+	pb.RegisterPortfolioServiceHTTPServer(srv, svc)
+	pb.RegisterDataServiceHTTPServer(srv, svc)
+	pb.RegisterAnalysisServiceHTTPServer(srv, svc)
 	return srv
-}
-
-func NewListener(cfg Config) (net.Listener, error) {
-	return net.Listen("tcp", cfg.GRPCAddr)
 }
 
 func Run(
 	lc fx.Lifecycle,
 	cfg Config,
-	lis net.Listener,
-	srv *grpc.Server,
+	httpSrv *khttp.Server,
 	store *data.Store,
-	sched *task.Scheduler,
+	sched *orchestrator.Scheduler,
+	cronSched *glcron.Scheduler,
+	conns *pythonConns,
 ) {
 	ctx, cancel := context.WithCancel(context.Background())
-	state := &runtimeState{}
 
 	lc.Append(fx.Hook{
 		OnStart: func(context.Context) error {
-			log.Printf("api server listening on %s (db: %s)", cfg.GRPCAddr, cfg.DBPath)
-			pyCfg := task.PythonSyncConfig{
-				PythonBin: cfg.PythonBin,
-				RepoRoot:  cfg.RepoRoot,
-				DBPath:    cfg.DBPath,
-			}
+			log.Printf("api server listening on %s (db: %s, crawler: %s, prediction: %s)",
+				cfg.HTTPAddr, cfg.DBPath, cfg.CrawlerAddr, cfg.PredictionAddr)
 			sched.Start(ctx)
-			schedCtx, schedCancel := context.WithCancel(ctx)
-			state.cancelScheduled = schedCancel
+			cronSched.Start()
 			go func() {
-				ticker := time.NewTicker(cfg.ScheduledSyncInterval)
-				defer ticker.Stop()
-				for {
-					select {
-					case <-schedCtx.Done():
-						return
-					case <-ticker.C:
-						if err := task.ScheduledSync(schedCtx, store, pyCfg, cfg.SyncLookbackDays); err != nil {
-							log.Printf("scheduled daily-sync: %v", err)
-						}
-					}
-				}
-			}()
-			go func() {
-				if err := srv.Serve(lis); err != nil {
-					log.Printf("serve: %v", err)
+				if err := httpSrv.Start(ctx); err != nil {
+					log.Printf("http serve: %v", err)
 				}
 			}()
 			return nil
 		},
-		OnStop: func(context.Context) error {
+		OnStop: func(stopCtx context.Context) error {
 			cancel()
-			if state.cancelScheduled != nil {
-				state.cancelScheduled()
-			}
 			sched.Stop()
-			stopped := make(chan struct{})
-			go func() {
-				srv.GracefulStop()
-				close(stopped)
-			}()
+			cronStop := cronSched.Stop()
 			select {
-			case <-stopped:
-			case <-time.After(5 * time.Second):
-				srv.Stop()
+			case <-cronStop.Done():
+			case <-stopCtx.Done():
+			}
+			if err := httpSrv.Stop(stopCtx); err != nil {
+				log.Printf("http stop: %v", err)
+			}
+			if conns != nil {
+				if conns.crawler != nil {
+					_ = conns.crawler.Close()
+				}
+				if conns.predict != nil {
+					_ = conns.predict.Close()
+				}
 			}
 			return store.Close()
 		},

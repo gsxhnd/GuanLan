@@ -7,10 +7,13 @@ func main() {
 		fx.Provide(
 			NewConfig,
 			NewStore,
+			NewBiz,
+			NewPythonClients,
+			NewPredictExecutor,
 			NewServices,
 			NewScheduler,
-			NewListener,
-			NewGRPCServer,
+			NewCron,
+			NewHTTPServer,
 		),
 		fx.Invoke(Run),
 	).Run()

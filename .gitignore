@@ -26,6 +26,9 @@ __pycache__/
 # Runtime data
 data/*
 
+# Frontend build
+web/dist/
+
 # Go build artifacts
 tmp/
 build-errors-*.log

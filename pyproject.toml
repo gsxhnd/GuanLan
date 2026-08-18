@@ -8,8 +8,11 @@ dependencies = [
     "yfinance>=1.4.1",
     "duckdb>=1.1.0",
     "pandas>=2.0.0",
+    "grpcio>=1.70.0",
+    "protobuf>=5.29.0",
+    "googleapis-common-protos>=1.66.0",
 ]
 
-# Python 能力按服务划分，见 services/daily_data/（日频数据）、后续 inference/、training/
+# Python 能力：quant/crawler（无状态行情）、quant/ml（训练读 Parquet 快照、推理 gRPC）
 [tool.uv]
 package = false

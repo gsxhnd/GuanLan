@@ -1,31 +1,29 @@
 # GuanLan
 
-观澜 (GuanLan)：语出《孟子》“观水有术，必观其澜”。寓意看股票趋势不能只看短期水花，而要观察中长期的波澜壮阔。
+观澜：语出《孟子》“观水有术，必观其澜”。本地优先的量化投资工作台（A 股 + 美股）。
 
-```shell
-# uv init -p 3.12
+详细说明：[docs/README.md](./docs/README.md)、[AGENTS.md](./AGENTS.md)。
+
+## 开发启动
+
+```bash
 uv sync
-
-# clone qlib source code for run script and learn code
-# git clone https://github.com/microsoft/qlib.git
-```
-
-```shell
 go mod tidy
 go install tool
-buf mod update
+buf generate
+
+# 可选：写出 baseline 模型，prediction 才不会返回 UNIMPLEMENTED
+uv run python -m quant.ml.training --model baseline
+
+goreman start   # api :8080 + crawler :50061 + prediction :50062
+# 前端
+cd web && pnpm dev   # :1420，代理 /api → :8080
 ```
 
-## Data
+## 进程
 
-[yahoo finance数据下载](https://github.com/ranaroussi/yfinance)
-[回测框架](https://github.com/mementum/backtrader)
-
-添加新功能 记录我操作股票/基金的记录
-
-- 建仓/加仓/减仓/清仓 记录
-- 买入/卖出 记录包含的 税费、佣金、滑点、流动性成本
-- 成本的计算
-- 分红记录
-- 总资本的计算 包含 本金、利息、分红、收益
-- 总资本的成份分析
+| 进程 | 地址 | 说明 |
+|------|------|------|
+| `cmd/api` | `:8080` | HTTP + DuckDB + 编排 + cron |
+| `quant.crawler` | `:50061` | 无状态行情 gRPC |
+| `quant.ml.serving` | `:50062` | 懒加载推理 gRPC |

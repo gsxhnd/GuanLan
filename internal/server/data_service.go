@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/gsxhnd/guanlan/internal/data"
-	pb "github.com/gsxhnd/guanlan/internal/proto/v1"
+	pb "github.com/gsxhnd/guanlan/internal/proto/quant/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -91,7 +91,7 @@ func (s *Services) ListDailyBars(ctx context.Context, req *pb.ListDailyBarsReque
 }
 
 func (s *Services) SyncStock(ctx context.Context, req *pb.SyncStockRequest) (*pb.Task, error) {
-	task, err := s.Store.CreateStockSyncTask(ctx, req.GetStockCode(), data.TriggerManual)
+	task, err := s.Biz.Task.CreateStockSyncTask(ctx, req.GetStockCode(), data.TriggerManual)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "sync stock: %v", err)
 	}

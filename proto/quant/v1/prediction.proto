@@ -1,0 +1,34 @@
+syntax = "proto3";
+
+package quant.v1;
+
+option go_package = "github.com/gsxhnd/guanlan/internal/proto/quant/v1;v1";
+
+message PredictRequest {
+  string stock_code = 1;
+  string trade_date = 2;
+  string model_version = 3;
+}
+
+message PredictResponse {
+  string stock_code = 1;
+  string trade_date = 2;
+  double score = 3;
+  string model_version = 4;
+}
+
+message PredictBatchRequest {
+  repeated string stock_codes = 1;
+  string trade_date = 2;
+  string model_version = 3;
+}
+
+message PredictBatchResponse {
+  repeated PredictResponse predictions = 1;
+}
+
+// PredictionService is a lazy-loaded inference API used by cmd/api orchestrator.
+service PredictionService {
+  rpc Predict(PredictRequest) returns (PredictResponse);
+  rpc PredictBatch(PredictBatchRequest) returns (PredictBatchResponse);
+}

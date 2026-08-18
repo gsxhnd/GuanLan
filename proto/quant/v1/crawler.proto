@@ -1,0 +1,37 @@
+syntax = "proto3";
+
+package quant.v1;
+
+option go_package = "github.com/gsxhnd/guanlan/internal/proto/quant/v1;v1";
+
+// FetchDailyBarsRequest asks the crawler for cleaned OHLCV for one or more symbols.
+message FetchDailyBarsRequest {
+  repeated string stock_codes = 1;
+  string start_date = 2;
+  string end_date = 3;
+}
+
+// CleanedDailyBar is a single OHLCV row produced by the crawler (no DB writes).
+message CleanedDailyBar {
+  string stock_code = 1;
+  string market = 2;
+  string trade_date = 3;
+  double open = 4;
+  double high = 5;
+  double low = 6;
+  double close = 7;
+  int64 volume = 8;
+  string source = 9;
+}
+
+// FetchDailyBarsResponse is one message per stock (server-streaming).
+message FetchDailyBarsResponse {
+  string stock_code = 1;
+  repeated CleanedDailyBar bars = 2;
+  string error = 3;
+}
+
+// CrawlerService is a stateless fetch/clean gRPC API used by cmd/api orchestrator.
+service CrawlerService {
+  rpc FetchDailyBars(FetchDailyBarsRequest) returns (stream FetchDailyBarsResponse);
+}

@@ -1,8 +1,8 @@
 syntax = "proto3";
 
-package guanlan.v1;
+package quant.v1;
 
-option go_package = "github.com/gsxhnd/guanlan/internal/proto/v1;v1";
+option go_package = "github.com/gsxhnd/guanlan/internal/proto/quant/v1;v1";
 
 import "google/api/annotations.proto";
 import "google/protobuf/timestamp.proto";
@@ -441,5 +441,51 @@ service DataService {
   }
   rpc UpsertStockPoolItem(UpsertStockPoolItemRequest) returns (StockPoolItem) {
     option (google.api.http) = {post: "/api/data/pool/items" body: "*"};
+  }
+}
+
+// --- Analysis ---
+
+message Prediction {
+  string prediction_id = 1;
+  string stock_code = 2;
+  string trade_date = 3;
+  double score = 4;
+  string model_version = 5;
+  google.protobuf.Timestamp created_at = 6;
+}
+
+message RunAnalysisRequest {
+  repeated string stock_codes = 1;
+  string trade_date = 2;
+  string model_version = 3;
+}
+
+message PredictOnDemandRequest {
+  string stock_code = 1;
+  string trade_date = 2;
+  string model_version = 3;
+}
+
+message ListPredictionsRequest {
+  string stock_code = 1;
+  string trade_date = 2;
+  string model_version = 3;
+  int32 limit = 4;
+}
+
+message ListPredictionsResponse {
+  repeated Prediction predictions = 1;
+}
+
+service AnalysisService {
+  rpc RunAnalysis(RunAnalysisRequest) returns (Task) {
+    option (google.api.http) = {post: "/api/analysis/run" body: "*"};
+  }
+  rpc PredictOnDemand(PredictOnDemandRequest) returns (Prediction) {
+    option (google.api.http) = {post: "/api/analysis/predict" body: "*"};
+  }
+  rpc ListPredictions(ListPredictionsRequest) returns (ListPredictionsResponse) {
+    option (google.api.http) = {get: "/api/analysis/results"};
   }
 }

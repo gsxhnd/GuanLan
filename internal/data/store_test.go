@@ -77,7 +77,7 @@ func TestStoreMigrateAndDataPageQueries(t *testing.T) {
 		t.Fatalf("expected 2 bars, got %d", len(bars))
 	}
 
-	task, err := store.CreateStockSyncTask(ctx, "600519.SS", TriggerManual)
+	task, err := store.CreateTask(ctx, TaskTypeDataSync, "600519.SS", TriggerManual, 0)
 	if err != nil {
 		t.Fatalf("create sync task: %v", err)
 	}

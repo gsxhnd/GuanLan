@@ -1,13 +1,10 @@
 # GuanLan Backend Services - goreman Procfile
 # Usage: goreman start
 #
-# Each service uses air for hot-reload during development.
-# For production, replace with direct binary execution:
-#   api: ./tmp/api
-#   gateway: ./tmp/gateway
+# api: HTTP + DuckDB + orchestrator + cron (:8080)
+# crawler: stateless Python gRPC (:50061)
+# prediction: lazy-loaded serving gRPC (:50062)
 
-# gRPC API Server (port :50051)
 api: air -c .air.api.toml
-
-# HTTP Gateway / gRPC-Gateway (port :8080)
-gateway: air -c .air.gateway.toml
+crawler: uv run python -m quant.crawler.server --addr :50061
+prediction: uv run python -m quant.ml.serving --addr :50062 --models data/models

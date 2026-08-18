@@ -2,6 +2,8 @@ package data
 
 // schemaDDL 创建数据页相关底层表。命名与 docs/dev/03-domain-model.md 字段对齐。
 const schemaDDL = `
+DROP TABLE IF EXISTS daily_features;
+
 CREATE TABLE IF NOT EXISTS daily_bars_raw (
 	stock_code   VARCHAR NOT NULL,
 	market       VARCHAR NOT NULL,
@@ -35,16 +37,6 @@ CREATE TABLE IF NOT EXISTS daily_bars (
 
 CREATE INDEX IF NOT EXISTS idx_daily_bars_stock_date
 	ON daily_bars (stock_code, trade_date DESC);
-
-CREATE TABLE IF NOT EXISTS daily_features (
-	stock_code    VARCHAR NOT NULL,
-	trade_date    DATE NOT NULL,
-	return_1d     DOUBLE,
-	volume_ma5    DOUBLE,
-	close_ma5     DOUBLE,
-	data_version  VARCHAR NOT NULL DEFAULT '',
-	PRIMARY KEY (stock_code, trade_date)
-);
 
 CREATE TABLE IF NOT EXISTS data_quality_issues (
 	issue_id      VARCHAR PRIMARY KEY,
@@ -211,5 +203,35 @@ CREATE TABLE IF NOT EXISTS portfolio_asset_snapshots (
 	holding_market_value   DOUBLE NOT NULL,
 	total_asset            DOUBLE NOT NULL,
 	source                 VARCHAR NOT NULL
+);
+
+CREATE TABLE IF NOT EXISTS model_versions (
+	model_version  VARCHAR PRIMARY KEY,
+	description    VARCHAR,
+	created_at     TIMESTAMPTZ NOT NULL,
+	artifact_path  VARCHAR
+);
+
+CREATE TABLE IF NOT EXISTS predictions (
+	prediction_id  VARCHAR PRIMARY KEY,
+	stock_code     VARCHAR NOT NULL,
+	trade_date     DATE NOT NULL,
+	score          DOUBLE NOT NULL,
+	model_version  VARCHAR NOT NULL,
+	created_at     TIMESTAMPTZ NOT NULL
+);
+
+CREATE INDEX IF NOT EXISTS idx_predictions_stock_date
+	ON predictions (stock_code, trade_date DESC);
+
+CREATE UNIQUE INDEX IF NOT EXISTS idx_predictions_unique
+	ON predictions (stock_code, trade_date, model_version);
+
+CREATE TABLE IF NOT EXISTS snapshots (
+	snapshot_id    VARCHAR PRIMARY KEY,
+	snapshot_path  VARCHAR NOT NULL,
+	description    VARCHAR,
+	row_count      BIGINT NOT NULL DEFAULT 0,
+	created_at     TIMESTAMPTZ NOT NULL
 );
 `

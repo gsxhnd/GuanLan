@@ -8,45 +8,12 @@ from typing import Any
 import pandas as pd
 import yfinance as yf
 
-
-def to_yahoo_symbol(stock_code: str) -> str:
-    code = stock_code.strip().upper()
-    if "." not in code:
-        return code
-    sym, suffix = code.rsplit(".", 1)
-    if suffix == "SH":
-        return f"{sym}.SS"
-    if suffix == "SZ":
-        return f"{sym}.SZ"
-    return code
+from quant.core.symbols import infer_market, to_yahoo_symbol
 
 
-def infer_market(stock_code: str) -> str:
-    code = stock_code.strip().upper()
-    if code.endswith(".SH") or code.endswith(".SZ"):
-        return "A"
-    return "US"
-
-
-def fetch_daily_bars(
-    stock_code: str,
-    *,
-    yfinance_symbol: str | None = None,
-    period: str | None = None,
-    lookback_days: int | None = None,
-) -> pd.DataFrame:
-    symbol = yfinance_symbol or to_yahoo_symbol(stock_code)
-    ticker = yf.Ticker(symbol)
-
-    if lookback_days is not None and lookback_days > 0:
-        start = date.today() - timedelta(days=lookback_days + 5)
-        end = date.today() + timedelta(days=1)
-        hist = ticker.history(start=start.isoformat(), end=end.isoformat(), auto_adjust=False)
-    else:
-        hist = ticker.history(period=period or "2y", auto_adjust=False)
-
+def _history_to_frame(stock_code: str, hist: pd.DataFrame) -> pd.DataFrame:
     if hist.empty:
-        raise RuntimeError(f"yfinance returned no data for {stock_code} ({symbol})")
+        raise RuntimeError(f"yfinance returned no data for {stock_code}")
 
     frame = hist.reset_index()
     if "Date" in frame.columns:
@@ -90,6 +57,39 @@ def fetch_daily_bars(
             "ingested_at",
         ]
     ]
+
+
+def fetch_daily_bars(
+    stock_code: str,
+    *,
+    yfinance_symbol: str | None = None,
+    period: str | None = None,
+    lookback_days: int | None = None,
+) -> pd.DataFrame:
+    symbol = yfinance_symbol or to_yahoo_symbol(stock_code)
+    ticker = yf.Ticker(symbol)
+
+    if lookback_days is not None and lookback_days > 0:
+        start = date.today() - timedelta(days=lookback_days + 5)
+        end = date.today() + timedelta(days=1)
+        hist = ticker.history(start=start.isoformat(), end=end.isoformat(), auto_adjust=False)
+    else:
+        hist = ticker.history(period=period or "2y", auto_adjust=False)
+
+    return _history_to_frame(stock_code, hist)
+
+
+def fetch_daily_bars_range(
+    stock_code: str,
+    *,
+    yfinance_symbol: str | None = None,
+    start: str | None = None,
+    end: str | None = None,
+) -> pd.DataFrame:
+    symbol = yfinance_symbol or to_yahoo_symbol(stock_code)
+    ticker = yf.Ticker(symbol)
+    hist = ticker.history(start=start, end=end, auto_adjust=False)
+    return _history_to_frame(stock_code, hist)
 
 
 def fetch_ticker_info(stock_code: str, yfinance_symbol: str | None = None) -> dict[str, Any]:

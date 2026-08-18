@@ -3,16 +3,18 @@ package server
 import (
 	"context"
 
+	"github.com/gsxhnd/guanlan/internal/biz"
 	"github.com/gsxhnd/guanlan/internal/data"
-	"github.com/gsxhnd/guanlan/internal/task"
-	pb "github.com/gsxhnd/guanlan/internal/proto/v1"
+	"github.com/gsxhnd/guanlan/internal/orchestrator"
+	pb "github.com/gsxhnd/guanlan/internal/proto/quant/v1"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
 
 type Services struct {
-	Store  *data.Store
-	Python task.PythonSyncConfig
+	Store   *data.Store
+	Biz     *biz.Services
+	Predict *orchestrator.PredictExecutor
 }
 
 func (s *Services) toTask(t data.DataSyncTask) *pb.Task {
@@ -60,7 +62,7 @@ func (s *Services) GetTask(ctx context.Context, req *pb.GetTaskRequest) (*pb.Tas
 }
 
 func (s *Services) RetryTask(ctx context.Context, req *pb.RetryTaskRequest) (*pb.RetryTaskResponse, error) {
-	task, err := s.Store.RetryTask(ctx, req.GetTaskId())
+	task, err := s.Biz.Task.RetryTask(ctx, req.GetTaskId())
 	if err != nil {
 		return nil, status.Errorf(codes.FailedPrecondition, "retry task: %v", err)
 	}
@@ -100,7 +102,7 @@ func (s *Services) ListWatchlist(ctx context.Context, req *pb.ListWatchlistReque
 }
 
 func (s *Services) AddWatchlistItem(ctx context.Context, req *pb.AddWatchlistItemRequest) (*pb.WatchlistItem, error) {
-	item, err := s.Store.AddWatchlistItem(ctx, data.WatchlistItem{
+	item, err := s.Biz.Watchlist.AddItem(ctx, data.WatchlistItem{
 		StockCode: req.GetStockCode(),
 		Market:    data.Market(req.GetMarket()),
 		Tags:      req.GetTags(),
@@ -111,18 +113,6 @@ func (s *Services) AddWatchlistItem(ctx context.Context, req *pb.AddWatchlistIte
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, "add watchlist item: %v", err)
 	}
-
-	_ = s.Store.EnsureStockInPool(ctx, item.StockCode, item.Market, item.StockCode)
-
-	// 若 DuckDB 无就绪日频数据则自动创建获取任务
-	ready, err := s.Store.StockHasReadyData(ctx, item.StockCode)
-	if err != nil {
-		return nil, status.Errorf(codes.Internal, "check stock data: %v", err)
-	}
-	if !ready {
-		_, _ = s.Store.CreateStockSyncTask(ctx, item.StockCode, data.TriggerManual)
-	}
-
 	return s.toWatchlistItem(item), nil
 }
 

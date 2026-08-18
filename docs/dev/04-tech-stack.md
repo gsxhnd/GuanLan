@@ -9,63 +9,56 @@
 | 前端 | React + TypeScript | 18+ |
 | 构建工具 | Vite | 5+ |
 | UI 组件库 | shadcn/ui | latest |
-| 外部网关 | gRPC Gateway | latest |
-| 接口服务 | Go + gRPC | 1.22+ |
-| 日频数据与推理 | Python + Qlib + PyTorch | 3.12+ / 2.x |
-| 训练与回测 | Python + Qlib + PyTorch | 3.12+ / 2.x |
-| 数据库 | DuckDB | latest |
-| 数据源 | yfinance + Qlib + 可扩展补充源 | latest |
-| 包管理 | uv / Go modules / pnpm 或 npm | stable |
-| 容器化 | Docker | 可选 |
+| HTTP | Kratos `transport/http` + `protoc-gen-go-http` | kratos v2 |
+| OpenAPI | `protoc-gen-openapiv2` | 与 HTTP 注解共用 |
+| 接口服务 | Go（唯一打开 DuckDB 的进程） | 见 `go.mod` |
+| 日频爬虫 | Python crawler gRPC（无状态） | 3.12+ |
+| 推理 | Python prediction gRPC（懒加载） | 3.12+ |
+| 训练 | Python CLI，内存 DuckDB 读 Parquet | 3.12+ |
+| 数据库 | DuckDB 单文件 | latest |
+| 数据源 | yfinance + 可扩展补充源 | latest |
+| DI / 定时 | uber-go/fx、robfig/cron | — |
+| 包管理 | uv / Go modules / pnpm | stable |
 
 ## 2. 选型理由
 
 ### 2.1 Go + Python
 
-- Go 负责 gRPC 接口服务、请求校验、任务编排和状态聚合，适合实现清晰稳定的本地服务边界。
-- gRPC Gateway 作为外部网关，将前端 HTTP/JSON 请求转换为内部 gRPC 调用。
-- Python 负责日频数据获取、特征工程、模型训练、回测和推理，便于复用 Qlib 与 PyTorch 生态。
-- 模型优先在 Python 推理服务中运行；是否导出 ONNX 作为独立部署格式视后续性能和部署需求决定。
+- Go 负责 HTTP、校验、任务编排和 DuckDB 读写。
+- Python 负责 yfinance 拉取、特征定义、训练与推理；**不打开** `data/guanlan.duckdb`。
+- 训练与推理分进程，避免训练拖垮 serving；特征列在 `quant/ml/features` 共用以防 train/serve skew。
+- 不用 `kratos.App` / Temporal；HTTP 只用 go-http + transport/http。
 
 ### 2.2 DuckDB
 
-- 嵌入式、零配置，不需要独立数据库服务。
-- 列式存储适合日频行情、特征和回测查询。
-- 支持本地文件化部署，便于备份和迁移。
+- 嵌入式、零配置；**整库单写者**，因此只由 `cmd/api` 打开。
+- 列式存储适合日频与快照 `COPY TO PARQUET`。
 
 ### 2.3 React + shadcn/ui
 
-- React 和 TypeScript 适合构建可维护的单用户工作台。
-- shadcn/ui 基于 Base UI 和 Tailwind CSS，组件可定制。
-- Vite 构建快，适合分阶段开发。
-
-### 2.4 Qlib
-
-- 提供数据处理、模型训练和回测能力。
-- 适合作为训练流程和量化工程设计参考。
-- 与 PyTorch 结合后便于导出可部署模型。
+- 单用户工作台；Vite 将 `/api` 代理到 `:8080`。
 
 ## 3. 外部依赖
 
 | 依赖 | 用途 | 备注 |
 |------|------|------|
-| yfinance | 美股数据获取 | Yahoo Finance 非官方 API |
-| Qlib | A 股数据、训练和回测参考 | Microsoft 开源项目 |
-| 可扩展补充源 | 数据冗余 | 具体源待决策 |
+| yfinance | 行情 | 非官方 API，无 SLA |
+| grpcio / protobuf | Python gRPC | crawler + prediction |
+| 可扩展补充源 | 数据冗余 | 见开放问题 |
 
 ## 4. 开发环境
 
 | 工具 | 用途 |
 |------|------|
-| uv | Python 依赖管理与虚拟环境 |
-| Go modules | Go 接口服务依赖管理 |
-| protoc / grpc-gateway | gRPC 与 HTTP 网关代码生成 |
-| pnpm/npm | 前端依赖管理 |
-| Docker | 可选容器化部署 |
+| uv | Python 依赖 |
+| Go modules + `go install tool` | 含 `protoc-gen-go-http`、air、goreman |
+| buf | proto lint / generate |
+| pnpm | 前端 |
+| goreman | 本地三进程：api + crawler + prediction |
 
 ## 5. 硬件约束
 
-优先适配 Jetson Orin Nano Super 这类资源受限本地环境：
+优先适配 Jetson Orin Nano Super：
 
 | 资源 | 规格 |
 |------|------|
@@ -75,7 +68,6 @@
 
 实现影响：
 
-1. Go 接口服务需要控制常驻内存占用，并避免承担重计算任务。
-2. Python 日频数据、训练和推理任务宜独立进程运行，避免与 API 服务抢占资源。
-3. DuckDB 需要配置合理内存上限。
-4. Python 推理可评估 Jetson GPU 加速收益，必要时再评估 ONNX 导出。
+1. Go 控制常驻内存；重计算放 Python。
+2. crawler 约 150–200MB；prediction + torch **必须懒加载**（当前 baseline 为 JSON，不导入 torch）。
+3. DuckDB 单进程写入。

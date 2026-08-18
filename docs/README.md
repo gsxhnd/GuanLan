@@ -39,6 +39,7 @@
 ## 维护约定
 
 1. 产品边界以 [dev/01-product-scope.md](./dev/01-product-scope.md) 为准。
-2. 工程推进与阶段拆分以 [dev/05-roadmap.md](./dev/05-roadmap.md) 为准。
-3. 项目知识库、使用指南、专题设计细节以 [wiki](./wiki/00-导读.md) 目录为准。
-4. 所有文档使用中文编写，文件按数字前缀排序。
+2. 系统架构与进程模型以 [dev/02-architecture.md](./dev/02-architecture.md) 为准。
+3. 工程推进与阶段拆分以 [dev/05-roadmap.md](./dev/05-roadmap.md) 为准。
+4. 项目知识库、使用指南、专题设计细节以 [wiki](./wiki/00-导读.md) 目录为准。
+5. 所有文档使用中文编写，文件按数字前缀排序。

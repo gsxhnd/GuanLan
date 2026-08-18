@@ -67,6 +67,15 @@ export type WatchlistItem = {
   addedAt?: string
 }
 
+export type Prediction = {
+  predictionId: string
+  stockCode: string
+  tradeDate: string
+  score: number
+  modelVersion: string
+  createdAt?: string
+}
+
 export type StockPoolItem = {
   yfinanceSymbol: string
   originalCode: string
@@ -142,5 +151,29 @@ export const api = {
     return request<{ items: StockPoolItem[]; total: number }>(
       `/data/pool${qs ? `?${qs}` : ""}`
     )
+  },
+
+  runAnalysis(body?: { stockCodes?: string[]; tradeDate?: string; modelVersion?: string }) {
+    return request<Task>("/analysis/run", {
+      method: "POST",
+      body: JSON.stringify(body ?? {}),
+    })
+  },
+
+  predictOnDemand(stockCode: string, tradeDate?: string, modelVersion?: string) {
+    return request<Prediction>("/analysis/predict", {
+      method: "POST",
+      body: JSON.stringify({ stockCode, tradeDate, modelVersion }),
+    })
+  },
+
+  listPredictions(params?: { stockCode?: string; tradeDate?: string; modelVersion?: string; limit?: number }) {
+    const q = new URLSearchParams()
+    if (params?.stockCode) q.set("stockCode", params.stockCode)
+    if (params?.tradeDate) q.set("tradeDate", params.tradeDate)
+    if (params?.modelVersion) q.set("modelVersion", params.modelVersion)
+    if (params?.limit) q.set("limit", String(params.limit))
+    const qs = q.toString()
+    return request<{ predictions: Prediction[] }>(`/analysis/results${qs ? `?${qs}` : ""}`)
   },
 }

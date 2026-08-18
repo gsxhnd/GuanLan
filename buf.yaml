@@ -3,11 +3,15 @@ version: v2
 modules:
   - path: proto
 deps:
-  - buf.build/bufbuild/protovalidate
   - buf.build/googleapis/googleapis
 lint:
   use:
     - STANDARD
+  except:
+    # Existing public API returns domain entities directly (Task, Trade, …).
+    - RPC_REQUEST_RESPONSE_UNIQUE
+    - RPC_REQUEST_STANDARD_NAME
+    - RPC_RESPONSE_STANDARD_NAME
 breaking:
   use:
     - FILE

@@ -8,32 +8,32 @@ import (
 )
 
 type Config struct {
-	GRPCAddr              string
-	DBPath                string
-	RepoRoot              string
-	PythonBin             string
-	SyncLookbackDays      int
-	TaskPollInterval      time.Duration
-	ScheduledSyncInterval time.Duration
+	HTTPAddr         string
+	DBPath           string
+	CrawlerAddr      string
+	PredictionAddr   string
+	SyncLookbackDays int
+	TaskPollInterval time.Duration
+	DailySyncCron    string
 }
 
 func NewConfig() Config {
-	grpcAddr := flag.String("addr", ":50051", "gRPC listen address")
+	httpAddr := flag.String("http", ":8080", "HTTP listen address")
 	dbPath := flag.String("db", data.DefaultDBPath, "DuckDB file path")
-	repoRoot := flag.String("repo-root", ".", "repository root for Python services")
-	pythonBin := flag.String("python", "uv", "Python runner (uv or python3)")
+	crawlerAddr := flag.String("crawler", "localhost:50061", "crawler gRPC address")
+	predictionAddr := flag.String("prediction", "localhost:50062", "prediction gRPC address")
 	lookback := flag.Int("sync-lookback-days", 7, "daily sync lookback window in days")
 	taskPoll := flag.Duration("task-poll", 2*time.Second, "task scheduler poll interval")
-	scheduledSync := flag.Duration("scheduled-sync", 24*time.Hour, "daily incremental sync interval")
+	dailyCron := flag.String("daily-sync-cron", "0 18 * * *", "robfig cron spec for daily sync enqueue")
 	flag.Parse()
 
 	return Config{
-		GRPCAddr:              *grpcAddr,
-		DBPath:                *dbPath,
-		RepoRoot:              *repoRoot,
-		PythonBin:             *pythonBin,
-		SyncLookbackDays:      *lookback,
-		TaskPollInterval:      *taskPoll,
-		ScheduledSyncInterval: *scheduledSync,
+		HTTPAddr:         *httpAddr,
+		DBPath:           *dbPath,
+		CrawlerAddr:      *crawlerAddr,
+		PredictionAddr:   *predictionAddr,
+		SyncLookbackDays: *lookback,
+		TaskPollInterval: *taskPoll,
+		DailySyncCron:    *dailyCron,
 	}
 }

@@ -4,8 +4,8 @@ from __future__ import annotations
 
 import pandas as pd
 
-from services.daily_data import clean, validate
-from services.daily_data.sources.yfinance import infer_market, to_yahoo_symbol
+from quant.crawler import clean, validate
+from quant.core.symbols import infer_market, to_yahoo_symbol
 
 
 def test_to_yahoo_symbol() -> None:
